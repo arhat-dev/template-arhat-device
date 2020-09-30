@@ -36,6 +36,9 @@ include scripts/build/template-arhat-device.mk
 # image
 include scripts/image/template-arhat-device.mk
 
+# manifest
+include scripts/gen/manifest.mk
+
 image.build.linux.all: \
 	image.build.template-arhat-device.linux.all
 

@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "template-arhat-device.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "template-arhat-device.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "template-arhat-device.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "template-arhat-device.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      tolerations:
+        - key: arhat.dev/namespace
+          value: {{ .Release.Namespace }}
+        - key: node.kubernetes.io/unschedulable
+          operator: Exists
+      containers:
+        - name: arhat-device
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /template-arhat-device
+            - -c
+            - /etc/template-arhat-device/config.yaml
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          volumeMounts:
+            - name: config
+              mountPath: /etc/template-arhat-device
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      nodeSelector:
+        arhat.dev/namespace: {{ .Release.Namespace }}
+      {{- with .Values.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "template-arhat-device.fullname" . }}

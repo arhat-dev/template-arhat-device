@@ -1,0 +1,91 @@
+---
+# Source: template-arhat-device/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: template-arhat-device
+  namespace: default
+  labels:
+    helm.sh/chart: template-arhat-device-0.1.0
+    app.kubernetes.io/name: template-arhat-device
+    app.kubernetes.io/instance: template-arhat-device
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  config.yaml: |
+    templateArhatDevice:
+      endpoint: unix:///var/run/arhat.sock
+      log:
+      - file: stderr
+        format: console
+        level: verbose
+      tls:
+        caCert: /path/to/caCert
+        cert: /path/to/client-cert
+        enabled: false
+        insecureSkipVerify: true
+        key: /path/to/client-cert-key
+---
+# Source: template-arhat-device/templates/daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: template-arhat-device
+  namespace: default
+  labels:
+    helm.sh/chart: template-arhat-device-0.1.0
+    app.kubernetes.io/name: template-arhat-device
+    app.kubernetes.io/instance: template-arhat-device
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: template-arhat-device
+      app.kubernetes.io/instance: template-arhat-device
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: template-arhat-device
+        app.kubernetes.io/instance: template-arhat-device
+    spec:
+      securityContext:
+        {}
+      tolerations:
+        - key: arhat.dev/namespace
+          value: default
+        - key: node.kubernetes.io/unschedulable
+          operator: Exists
+      containers:
+        - name: arhat-device
+          securityContext:
+            {}
+          image: "docker.io/arhatdev/template-arhat-device:1.16.0"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /template-arhat-device
+            - -c
+            - /etc/template-arhat-device/config.yaml
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          volumeMounts:
+            - name: config
+              mountPath: /etc/template-arhat-device
+          resources:
+            {}
+      nodeSelector:
+        arhat.dev/namespace: default
+      volumes:
+        - name: config
+          configMap:
+            name: template-arhat-device
