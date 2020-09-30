@@ -87,6 +87,7 @@ func (c *Controller) handleSession() {
 		// new session, register first
 
 		sendMsg := func(msg *arhatgopb.Msg) (sent bool) {
+			c.logger.V("sending msg")
 			select {
 			case <-cb.closed:
 				return false
@@ -97,19 +98,23 @@ func (c *Controller) handleSession() {
 			}
 		}
 
+		c.logger.I("registering myself")
 		if !sendMsg(c.regMsg) {
 			c.logger.I("failed to send register msg")
 			continue
 		}
 
+		c.logger.I("receiving cmds")
 	loop:
 		for cmd := range cb.cmdCh {
 			var ret proto.Marshaler
 			switch cmd.Kind {
 			case arhatgopb.CMD_DEV_CLOSE:
+				c.logger.D("removing device")
 				c.removeDevice(cmd.DeviceId)
 				ret = &arhatgopb.DoneMsg{}
 			case arhatgopb.CMD_DEV_CONNECT:
+				c.logger.D("connecting device")
 				err := c.handleDeviceConnect(cmd.DeviceId, cmd.Payload)
 				if err != nil {
 					ret = &arhatgopb.ErrorMsg{Description: err.Error()}
@@ -117,6 +122,7 @@ func (c *Controller) handleSession() {
 					ret = &arhatgopb.DoneMsg{}
 				}
 			default:
+				c.logger.D("doing device specific operation")
 				// requires device
 				handle, ok := handlerMap[cmd.Kind]
 				if !ok {

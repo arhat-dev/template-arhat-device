@@ -101,13 +101,14 @@ func run(appCtx context.Context, config *conf.TemplateArhatDeviceConfig) error {
 		return fmt.Errorf("failed to start controller: %w", err)
 	}
 
+	logger.I("running")
 	for {
 		select {
 		case <-appCtx.Done():
 			return nil
 		default:
 			cmdCh, msgCh := ctrl.RefreshChannels()
-			err = processNewJSONStream(appCtx, u.Scheme, u.Host, tlsConfig, cmdCh, msgCh)
+			err = processNewJSONStream(appCtx, u.Scheme, u.Host+u.Path, tlsConfig, cmdCh, msgCh)
 			if err != nil {
 				logger.I("error happened when processing json stream", log.Error(err))
 			}
@@ -126,7 +127,21 @@ func processNewJSONStream(
 
 	pr, pw := iohelper.Pipe()
 
-	resp, err := client.Post("/ext/devices", "application/json", pr)
+	req, err := http.NewRequest(http.MethodPost, "", pr)
+	if err != nil {
+		panic(err)
+	}
+
+	req.Host = addr
+	req.URL.Path = "/ext/devices"
+	req.URL.Host = addr
+	req.URL.Scheme = "http"
+	if tlsConfig != nil {
+		req.URL.Scheme = "https"
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to start sync loop for the first time: %w", err)
 	}
