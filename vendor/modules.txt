@@ -1,4 +1,4 @@
-# arhat.dev/arhat-proto v0.0.0-20200930004331-ac80a4dbdfb4
+# arhat.dev/arhat-proto v0.0.0-20200930174402-b7b2c57c1e82
 ## explicit
 arhat.dev/arhat-proto/arhatgopb
 # arhat.dev/pkg v0.0.0-20200930092909-aa3af7acc29c

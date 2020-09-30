@@ -1,5 +1,5 @@
-arhat.dev/arhat-proto v0.0.0-20200930004331-ac80a4dbdfb4 h1:3n0uN0OAJetKKBGuM1t3azmBonyZRW7X9/Yx0xJvfiE=
-arhat.dev/arhat-proto v0.0.0-20200930004331-ac80a4dbdfb4/go.mod h1:Pd9J0IeEjj8dCxXvMDn+q2f8C04/yS4CUbpOO5jfb4o=
+arhat.dev/arhat-proto v0.0.0-20200930174402-b7b2c57c1e82 h1:TaAQLcmW6ws9I6+WAZoJq53yK34Do/fErhUUnXqZgV0=
+arhat.dev/arhat-proto v0.0.0-20200930174402-b7b2c57c1e82/go.mod h1:Pd9J0IeEjj8dCxXvMDn+q2f8C04/yS4CUbpOO5jfb4o=
 arhat.dev/pkg v0.0.0-20200930092909-aa3af7acc29c h1:Tr5Yg/ka46kyPPvqFp+DUywEEP2WpT0TlDjlFO5EmVA=
 arhat.dev/pkg v0.0.0-20200930092909-aa3af7acc29c/go.mod h1:a5qmenmejj79BYY2Xe8RaHwJA/HChEYWuzbqdmqnYc4=
 bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690/go.mod h1:Ulb78X89vxKYgdL24HMTiXYHlyHEvruOj1ZPlqeNEZM=

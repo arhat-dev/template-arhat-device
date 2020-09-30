@@ -32,7 +32,6 @@ type CmdType int32
 
 const (
 	_INVALID_CMD            CmdType = 0
-	CMD_SESSION_SET         CmdType = 1
 	CMD_DEV_CONNECT         CmdType = 11
 	CMD_DEV_OPERATE         CmdType = 12
 	CMD_DEV_COLLECT_METRICS CmdType = 13
@@ -41,7 +40,6 @@ const (
 
 var CmdType_name = map[int32]string{
 	0:  "_INVALID_CMD",
-	1:  "CMD_SESSION_SET",
 	11: "CMD_DEV_CONNECT",
 	12: "CMD_DEV_OPERATE",
 	13: "CMD_DEV_COLLECT_METRICS",
@@ -50,7 +48,6 @@ var CmdType_name = map[int32]string{
 
 var CmdType_value = map[string]int32{
 	"_INVALID_CMD":            0,
-	"CMD_SESSION_SET":         1,
 	"CMD_DEV_CONNECT":         11,
 	"CMD_DEV_OPERATE":         12,
 	"CMD_DEV_COLLECT_METRICS": 13,
@@ -99,10 +96,10 @@ func (MsgType) EnumDescriptor() ([]byte, []int) {
 
 type Cmd struct {
 	Kind CmdType `protobuf:"varint,1,opt,name=kind,proto3,enum=arhat.CmdType" json:"kind,omitempty"`
-	// id assigned by the device manager in arhat agent
-	DeviceId uint64 `protobuf:"varint,2,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	Seq      uint64 `protobuf:"varint,3,opt,name=seq,proto3" json:"seq,omitempty"`
-	Payload  []byte `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	// id assigned by the arhat extension manager
+	Id      uint64 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+	Seq     uint64 `protobuf:"varint,3,opt,name=seq,proto3" json:"seq,omitempty"`
+	Payload []byte `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
 }
 
 func (m *Cmd) Reset()      { *m = Cmd{} }
@@ -144,9 +141,9 @@ func (m *Cmd) GetKind() CmdType {
 	return _INVALID_CMD
 }
 
-func (m *Cmd) GetDeviceId() uint64 {
+func (m *Cmd) GetId() uint64 {
 	if m != nil {
-		return m.DeviceId
+		return m.Id
 	}
 	return 0
 }
@@ -165,65 +162,19 @@ func (m *Cmd) GetPayload() []byte {
 	return nil
 }
 
-type SessionSetCmd struct {
-	SessionId string `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-}
-
-func (m *SessionSetCmd) Reset()      { *m = SessionSetCmd{} }
-func (*SessionSetCmd) ProtoMessage() {}
-func (*SessionSetCmd) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2fcc84b9998d60d8, []int{1}
-}
-func (m *SessionSetCmd) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *SessionSetCmd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SessionSetCmd.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *SessionSetCmd) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SessionSetCmd.Merge(m, src)
-}
-func (m *SessionSetCmd) XXX_Size() int {
-	return m.Size()
-}
-func (m *SessionSetCmd) XXX_DiscardUnknown() {
-	xxx_messageInfo_SessionSetCmd.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SessionSetCmd proto.InternalMessageInfo
-
-func (m *SessionSetCmd) GetSessionId() string {
-	if m != nil {
-		return m.SessionId
-	}
-	return ""
-}
-
 type Msg struct {
-	// session id is a random string assigned by arhat agent
-	// after the initial successful registration
-	SessionId string  `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	Kind      MsgType `protobuf:"varint,2,opt,name=kind,proto3,enum=arhat.MsgType" json:"kind,omitempty"`
-	// id assigned by the device manager in arhat agent
-	DeviceId uint64 `protobuf:"varint,3,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	Kind MsgType `protobuf:"varint,1,opt,name=kind,proto3,enum=arhat.MsgType" json:"kind,omitempty"`
+	// id assigned by the arhat extension manager
+	Id uint64 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
 	// (optional) if this is an answer for a Cmd, set ack to seq in Cmd
-	Ack     uint64 `protobuf:"varint,4,opt,name=ack,proto3" json:"ack,omitempty"`
-	Payload []byte `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
+	Ack     uint64 `protobuf:"varint,3,opt,name=ack,proto3" json:"ack,omitempty"`
+	Payload []byte `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
 }
 
 func (m *Msg) Reset()      { *m = Msg{} }
 func (*Msg) ProtoMessage() {}
 func (*Msg) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2fcc84b9998d60d8, []int{2}
+	return fileDescriptor_2fcc84b9998d60d8, []int{1}
 }
 func (m *Msg) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -252,13 +203,6 @@ func (m *Msg) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Msg proto.InternalMessageInfo
 
-func (m *Msg) GetSessionId() string {
-	if m != nil {
-		return m.SessionId
-	}
-	return ""
-}
-
 func (m *Msg) GetKind() MsgType {
 	if m != nil {
 		return m.Kind
@@ -266,9 +210,9 @@ func (m *Msg) GetKind() MsgType {
 	return _INVALID_MSG
 }
 
-func (m *Msg) GetDeviceId() uint64 {
+func (m *Msg) GetId() uint64 {
 	if m != nil {
-		return m.DeviceId
+		return m.Id
 	}
 	return 0
 }
@@ -293,7 +237,7 @@ type DoneMsg struct {
 func (m *DoneMsg) Reset()      { *m = DoneMsg{} }
 func (*DoneMsg) ProtoMessage() {}
 func (*DoneMsg) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2fcc84b9998d60d8, []int{3}
+	return fileDescriptor_2fcc84b9998d60d8, []int{2}
 }
 func (m *DoneMsg) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -329,7 +273,7 @@ type ErrorMsg struct {
 func (m *ErrorMsg) Reset()      { *m = ErrorMsg{} }
 func (*ErrorMsg) ProtoMessage() {}
 func (*ErrorMsg) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2fcc84b9998d60d8, []int{4}
+	return fileDescriptor_2fcc84b9998d60d8, []int{3}
 }
 func (m *ErrorMsg) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -372,7 +316,7 @@ type RegisterMsg struct {
 func (m *RegisterMsg) Reset()      { *m = RegisterMsg{} }
 func (*RegisterMsg) ProtoMessage() {}
 func (*RegisterMsg) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2fcc84b9998d60d8, []int{5}
+	return fileDescriptor_2fcc84b9998d60d8, []int{4}
 }
 func (m *RegisterMsg) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -412,7 +356,6 @@ func init() {
 	proto.RegisterEnum("arhat.CmdType", CmdType_name, CmdType_value)
 	proto.RegisterEnum("arhat.MsgType", MsgType_name, MsgType_value)
 	proto.RegisterType((*Cmd)(nil), "arhat.Cmd")
-	proto.RegisterType((*SessionSetCmd)(nil), "arhat.SessionSetCmd")
 	proto.RegisterType((*Msg)(nil), "arhat.Msg")
 	proto.RegisterType((*DoneMsg)(nil), "arhat.DoneMsg")
 	proto.RegisterType((*ErrorMsg)(nil), "arhat.ErrorMsg")
@@ -422,40 +365,36 @@ func init() {
 func init() { proto.RegisterFile("proto.proto", fileDescriptor_2fcc84b9998d60d8) }
 
 var fileDescriptor_2fcc84b9998d60d8 = []byte{
-	// 513 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x93, 0x4f, 0x8f, 0x93, 0x40,
-	0x18, 0xc6, 0x99, 0xa5, 0x6b, 0xb7, 0x6f, 0xff, 0x38, 0x8e, 0x07, 0x49, 0x56, 0xc7, 0xca, 0xa9,
-	0xd9, 0x68, 0x4d, 0xf4, 0x13, 0xac, 0x30, 0x69, 0x48, 0x0a, 0x98, 0x19, 0xb6, 0x07, 0x2f, 0x84,
-	0x2d, 0x93, 0x4a, 0xd6, 0x96, 0x0a, 0xcd, 0x26, 0x7b, 0xf3, 0xec, 0xc9, 0xfd, 0x16, 0x7e, 0x14,
-	0x8f, 0x3d, 0xee, 0xd1, 0xd2, 0x8b, 0xc7, 0xfd, 0x08, 0x86, 0x29, 0xad, 0x6d, 0x8c, 0xf1, 0x42,
-	0x9e, 0xf7, 0xf7, 0xbc, 0xc0, 0xf3, 0x4c, 0x00, 0x9a, 0xf3, 0x2c, 0x5d, 0xa4, 0x7d, 0x75, 0x25,
-	0xc7, 0x51, 0xf6, 0x31, 0x5a, 0x98, 0x19, 0xe8, 0xd6, 0x34, 0x26, 0x26, 0xd4, 0xae, 0x92, 0x59,
-	0x6c, 0xa0, 0x2e, 0xea, 0x75, 0xde, 0x74, 0xfa, 0xca, 0xec, 0x5b, 0xd3, 0x38, 0xb8, 0x99, 0x4b,
-	0xae, 0x3c, 0x72, 0x0a, 0x8d, 0x58, 0x5e, 0x27, 0x63, 0x19, 0x26, 0xb1, 0x71, 0xd4, 0x45, 0xbd,
-	0x1a, 0x3f, 0xd9, 0x00, 0x27, 0x26, 0x18, 0xf4, 0x5c, 0x7e, 0x36, 0x74, 0x85, 0x4b, 0x49, 0x0c,
-	0xa8, 0xcf, 0xa3, 0x9b, 0x4f, 0x69, 0x14, 0x1b, 0xb5, 0x2e, 0xea, 0xb5, 0xf8, 0x76, 0x34, 0xfb,
-	0xd0, 0x16, 0x32, 0xcf, 0x93, 0x74, 0x26, 0xe4, 0xa2, 0x7c, 0xfb, 0x33, 0x80, 0x7c, 0x03, 0xca,
-	0x47, 0x97, 0x19, 0x1a, 0xbc, 0x51, 0x11, 0x27, 0x36, 0x6f, 0x11, 0xe8, 0x6e, 0x3e, 0xf9, 0xcf,
-	0xda, 0xae, 0xc3, 0xd1, 0x41, 0x07, 0x37, 0x9f, 0xfc, 0xab, 0x83, 0xfe, 0x77, 0x87, 0x68, 0x7c,
-	0xa5, 0xd2, 0xd6, 0x78, 0x29, 0xf7, 0x3b, 0x1c, 0x1f, 0x76, 0x68, 0x40, 0xdd, 0x4e, 0x67, 0xd2,
-	0xcd, 0x27, 0xe6, 0x4b, 0x38, 0x61, 0x59, 0x96, 0x66, 0x65, 0xc4, 0x2e, 0x34, 0x63, 0x99, 0x8f,
-	0xb3, 0x64, 0xbe, 0x48, 0xd2, 0x59, 0x95, 0x71, 0x1f, 0x99, 0x2f, 0xa0, 0xc9, 0xe5, 0x24, 0xc9,
-	0x17, 0x52, 0xdd, 0x40, 0xa0, 0x36, 0x8b, 0xa6, 0xb2, 0xda, 0x54, 0xfa, 0xec, 0x2b, 0x82, 0x7a,
-	0x75, 0xf4, 0x04, 0x43, 0x2b, 0x74, 0xbc, 0xd1, 0xf9, 0xd0, 0xb1, 0x43, 0xcb, 0xb5, 0xb1, 0x46,
-	0x1e, 0xc3, 0x43, 0xcb, 0xb5, 0x43, 0xc1, 0x84, 0x70, 0x7c, 0x2f, 0x14, 0x2c, 0xc0, 0x68, 0x0b,
-	0x6d, 0x36, 0x0a, 0x2d, 0xdf, 0xf3, 0x98, 0x15, 0xe0, 0xe6, 0x3e, 0xf4, 0xdf, 0x33, 0x7e, 0x1e,
-	0x30, 0xdc, 0x22, 0xa7, 0xf0, 0xe4, 0xcf, 0xe6, 0x70, 0xc8, 0xac, 0x20, 0x74, 0x59, 0xc0, 0x1d,
-	0x4b, 0xe0, 0x36, 0x79, 0x04, 0xed, 0x9d, 0x39, 0xf4, 0x05, 0xc3, 0x9d, 0xb3, 0x5b, 0x04, 0xf5,
-	0xea, 0x0c, 0x0f, 0xc2, 0xb8, 0x62, 0x80, 0x35, 0xd2, 0x86, 0x86, 0x2b, 0x06, 0x21, 0xe3, 0xdc,
-	0xe7, 0x18, 0x91, 0x16, 0x9c, 0x94, 0xa3, 0xed, 0x7b, 0x0c, 0x1f, 0x95, 0xeb, 0xe5, 0xc4, 0xd9,
-	0xc0, 0x11, 0x01, 0xe3, 0x58, 0x27, 0x4f, 0xc1, 0x50, 0xfe, 0x2e, 0x51, 0xd9, 0x80, 0x33, 0x71,
-	0x31, 0xac, 0xf2, 0x6e, 0xdd, 0x6d, 0xa4, 0x16, 0x21, 0xd0, 0xd9, 0x42, 0x36, 0x62, 0x5e, 0x20,
-	0x70, 0xfb, 0xdd, 0xc5, 0x72, 0x45, 0xb5, 0xbb, 0x15, 0xd5, 0xee, 0x57, 0x14, 0x7d, 0x29, 0x28,
-	0xfa, 0x5e, 0x50, 0xf4, 0xa3, 0xa0, 0x68, 0x59, 0x50, 0xf4, 0xb3, 0xa0, 0xe8, 0x57, 0x41, 0xb5,
-	0xfb, 0x82, 0xa2, 0x6f, 0x6b, 0xaa, 0x2d, 0xd7, 0x54, 0xbb, 0x5b, 0x53, 0xed, 0xc3, 0xf3, 0xcd,
-	0x07, 0x11, 0xcb, 0xeb, 0xd7, 0x4a, 0xbd, 0x52, 0x3f, 0xc2, 0x46, 0x4f, 0xd2, 0xf9, 0xe5, 0xe5,
-	0x03, 0x05, 0xde, 0xfe, 0x0e, 0x00, 0x00, 0xff, 0xff, 0x2f, 0xd2, 0x93, 0xd6, 0x28, 0x03, 0x00,
-	0x00,
+	// 454 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x92, 0x3f, 0x8e, 0xd3, 0x40,
+	0x14, 0xc6, 0x3d, 0x49, 0x20, 0x9b, 0x17, 0xc7, 0x0c, 0x43, 0x81, 0x25, 0xd0, 0x10, 0x52, 0x45,
+	0x2b, 0x08, 0x12, 0x9c, 0x60, 0xb1, 0x47, 0x91, 0x25, 0xff, 0x41, 0x63, 0x6f, 0x0a, 0x1a, 0xcb,
+	0x1b, 0x8f, 0x8c, 0x15, 0x12, 0x1b, 0x3b, 0x20, 0x6d, 0xc7, 0x11, 0xe0, 0x16, 0x1c, 0x85, 0x32,
+	0xe5, 0x96, 0xc4, 0x69, 0x28, 0xf7, 0x08, 0xc8, 0xb3, 0xf6, 0xb2, 0x14, 0xa4, 0x19, 0x7d, 0xef,
+	0xfb, 0xde, 0xe8, 0xf7, 0xf4, 0x66, 0x60, 0x98, 0x17, 0xd9, 0x36, 0x9b, 0xc9, 0x93, 0xdc, 0x8b,
+	0x8a, 0x0f, 0xd1, 0x76, 0x22, 0xa0, 0x6b, 0xac, 0x63, 0x32, 0x81, 0xde, 0x2a, 0xdd, 0xc4, 0x3a,
+	0x1a, 0xa3, 0xa9, 0xf6, 0x5a, 0x9b, 0xc9, 0x70, 0x66, 0xac, 0xe3, 0xe0, 0x32, 0x17, 0x5c, 0x66,
+	0x44, 0x83, 0x4e, 0x1a, 0xeb, 0x9d, 0x31, 0x9a, 0xf6, 0x78, 0x27, 0x8d, 0x09, 0x86, 0x6e, 0x29,
+	0x3e, 0xe9, 0x5d, 0x69, 0xd4, 0x92, 0xe8, 0xd0, 0xcf, 0xa3, 0xcb, 0x8f, 0x59, 0x14, 0xeb, 0xbd,
+	0x31, 0x9a, 0xaa, 0xbc, 0x2d, 0x6b, 0x8c, 0x53, 0x26, 0xff, 0xc1, 0x38, 0x65, 0x72, 0x1c, 0x13,
+	0x2d, 0x57, 0x2d, 0x26, 0x5a, 0xae, 0x8e, 0x60, 0x06, 0xd0, 0x37, 0xb3, 0x8d, 0x70, 0xca, 0x64,
+	0xf2, 0x02, 0x4e, 0x58, 0x51, 0x64, 0x45, 0x8d, 0x1d, 0xc3, 0x30, 0x16, 0xe5, 0xb2, 0x48, 0xf3,
+	0x6d, 0x9a, 0x6d, 0x24, 0x7d, 0xc0, 0xef, 0x5a, 0x93, 0xe7, 0x30, 0xe4, 0x22, 0x49, 0xcb, 0xad,
+	0x90, 0x17, 0x08, 0xf4, 0x36, 0xd1, 0x5a, 0x34, 0x9d, 0x52, 0x9f, 0x7e, 0x86, 0x7e, 0xb3, 0x0f,
+	0x82, 0x41, 0x0d, 0x2d, 0x77, 0x71, 0x66, 0x5b, 0x66, 0x68, 0x38, 0x26, 0x56, 0xc8, 0x23, 0x78,
+	0x60, 0x38, 0x66, 0x68, 0xb2, 0x45, 0x68, 0x78, 0xae, 0xcb, 0x8c, 0x00, 0x0f, 0xef, 0x9a, 0xde,
+	0x3b, 0xc6, 0xcf, 0x02, 0x86, 0x55, 0xf2, 0x04, 0x1e, 0xff, 0xed, 0xb4, 0x6d, 0x66, 0x04, 0xa1,
+	0xc3, 0x02, 0x6e, 0x19, 0x3e, 0x1e, 0x91, 0x87, 0x30, 0xba, 0x0d, 0x6d, 0xcf, 0x67, 0x58, 0x3b,
+	0xfd, 0x8e, 0xa0, 0xdf, 0x2c, 0xe8, 0x1f, 0xae, 0xe3, 0xcf, 0xb1, 0x42, 0x46, 0x30, 0x70, 0xfc,
+	0x79, 0xc8, 0x38, 0xf7, 0x38, 0x46, 0x44, 0x85, 0x93, 0xba, 0x34, 0x3d, 0x97, 0xe1, 0x4e, 0xdd,
+	0x5e, 0x57, 0x9c, 0xcd, 0x2d, 0x3f, 0x60, 0x1c, 0x77, 0xc9, 0x53, 0xd0, 0x65, 0x7e, 0x3b, 0x91,
+	0xe5, 0xb9, 0x21, 0x67, 0xfe, 0xb9, 0xdd, 0xcc, 0xdb, 0xa6, 0xed, 0x48, 0x2a, 0x21, 0xa0, 0xb5,
+	0x26, 0x5b, 0x30, 0x37, 0xf0, 0xf1, 0xe8, 0xed, 0xf9, 0x6e, 0x4f, 0x95, 0xab, 0x3d, 0x55, 0xae,
+	0xf7, 0x14, 0x7d, 0xad, 0x28, 0xfa, 0x51, 0x51, 0xf4, 0xb3, 0xa2, 0x68, 0x57, 0x51, 0xf4, 0xab,
+	0xa2, 0xe8, 0x77, 0x45, 0x95, 0xeb, 0x8a, 0xa2, 0x6f, 0x07, 0xaa, 0xec, 0x0e, 0x54, 0xb9, 0x3a,
+	0x50, 0xe5, 0xfd, 0xb3, 0x9b, 0xd7, 0x8e, 0xc5, 0x97, 0x57, 0x52, 0xbd, 0x94, 0x1f, 0xf1, 0x46,
+	0x27, 0x59, 0x7e, 0x71, 0x71, 0x5f, 0x1a, 0x6f, 0xfe, 0x04, 0x00, 0x00, 0xff, 0xff, 0xa8, 0x1e,
+	0x48, 0x64, 0xa8, 0x02, 0x00, 0x00,
 }
 
 func (x CmdType) String() string {
@@ -494,37 +433,13 @@ func (this *Cmd) Equal(that interface{}) bool {
 	if this.Kind != that1.Kind {
 		return false
 	}
-	if this.DeviceId != that1.DeviceId {
+	if this.Id != that1.Id {
 		return false
 	}
 	if this.Seq != that1.Seq {
 		return false
 	}
 	if !bytes.Equal(this.Payload, that1.Payload) {
-		return false
-	}
-	return true
-}
-func (this *SessionSetCmd) Equal(that interface{}) bool {
-	if that == nil {
-		return this == nil
-	}
-
-	that1, ok := that.(*SessionSetCmd)
-	if !ok {
-		that2, ok := that.(SessionSetCmd)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		return this == nil
-	} else if this == nil {
-		return false
-	}
-	if this.SessionId != that1.SessionId {
 		return false
 	}
 	return true
@@ -548,13 +463,10 @@ func (this *Msg) Equal(that interface{}) bool {
 	} else if this == nil {
 		return false
 	}
-	if this.SessionId != that1.SessionId {
-		return false
-	}
 	if this.Kind != that1.Kind {
 		return false
 	}
-	if this.DeviceId != that1.DeviceId {
+	if this.Id != that1.Id {
 		return false
 	}
 	if this.Ack != that1.Ack {
@@ -641,19 +553,9 @@ func (this *Cmd) GoString() string {
 	s := make([]string, 0, 8)
 	s = append(s, "&arhatgopb.Cmd{")
 	s = append(s, "Kind: "+fmt.Sprintf("%#v", this.Kind)+",\n")
-	s = append(s, "DeviceId: "+fmt.Sprintf("%#v", this.DeviceId)+",\n")
+	s = append(s, "Id: "+fmt.Sprintf("%#v", this.Id)+",\n")
 	s = append(s, "Seq: "+fmt.Sprintf("%#v", this.Seq)+",\n")
 	s = append(s, "Payload: "+fmt.Sprintf("%#v", this.Payload)+",\n")
-	s = append(s, "}")
-	return strings.Join(s, "")
-}
-func (this *SessionSetCmd) GoString() string {
-	if this == nil {
-		return "nil"
-	}
-	s := make([]string, 0, 5)
-	s = append(s, "&arhatgopb.SessionSetCmd{")
-	s = append(s, "SessionId: "+fmt.Sprintf("%#v", this.SessionId)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -661,11 +563,10 @@ func (this *Msg) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 9)
+	s := make([]string, 0, 8)
 	s = append(s, "&arhatgopb.Msg{")
-	s = append(s, "SessionId: "+fmt.Sprintf("%#v", this.SessionId)+",\n")
 	s = append(s, "Kind: "+fmt.Sprintf("%#v", this.Kind)+",\n")
-	s = append(s, "DeviceId: "+fmt.Sprintf("%#v", this.DeviceId)+",\n")
+	s = append(s, "Id: "+fmt.Sprintf("%#v", this.Id)+",\n")
 	s = append(s, "Ack: "+fmt.Sprintf("%#v", this.Ack)+",\n")
 	s = append(s, "Payload: "+fmt.Sprintf("%#v", this.Payload)+",\n")
 	s = append(s, "}")
@@ -740,8 +641,8 @@ func (m *Cmd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x18
 	}
-	if m.DeviceId != 0 {
-		i = encodeVarintProto(dAtA, i, uint64(m.DeviceId))
+	if m.Id != 0 {
+		i = encodeVarintProto(dAtA, i, uint64(m.Id))
 		i--
 		dAtA[i] = 0x10
 	}
@@ -749,36 +650,6 @@ func (m *Cmd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintProto(dAtA, i, uint64(m.Kind))
 		i--
 		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *SessionSetCmd) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SessionSetCmd) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *SessionSetCmd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.SessionId) > 0 {
-		i -= len(m.SessionId)
-		copy(dAtA[i:], m.SessionId)
-		i = encodeVarintProto(dAtA, i, uint64(len(m.SessionId)))
-		i--
-		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -808,29 +679,22 @@ func (m *Msg) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Payload)
 		i = encodeVarintProto(dAtA, i, uint64(len(m.Payload)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 	}
 	if m.Ack != 0 {
 		i = encodeVarintProto(dAtA, i, uint64(m.Ack))
 		i--
-		dAtA[i] = 0x20
-	}
-	if m.DeviceId != 0 {
-		i = encodeVarintProto(dAtA, i, uint64(m.DeviceId))
-		i--
 		dAtA[i] = 0x18
+	}
+	if m.Id != 0 {
+		i = encodeVarintProto(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x10
 	}
 	if m.Kind != 0 {
 		i = encodeVarintProto(dAtA, i, uint64(m.Kind))
 		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.SessionId) > 0 {
-		i -= len(m.SessionId)
-		copy(dAtA[i:], m.SessionId)
-		i = encodeVarintProto(dAtA, i, uint64(len(m.SessionId)))
-		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -938,26 +802,13 @@ func (m *Cmd) Size() (n int) {
 	if m.Kind != 0 {
 		n += 1 + sovProto(uint64(m.Kind))
 	}
-	if m.DeviceId != 0 {
-		n += 1 + sovProto(uint64(m.DeviceId))
+	if m.Id != 0 {
+		n += 1 + sovProto(uint64(m.Id))
 	}
 	if m.Seq != 0 {
 		n += 1 + sovProto(uint64(m.Seq))
 	}
 	l = len(m.Payload)
-	if l > 0 {
-		n += 1 + l + sovProto(uint64(l))
-	}
-	return n
-}
-
-func (m *SessionSetCmd) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.SessionId)
 	if l > 0 {
 		n += 1 + l + sovProto(uint64(l))
 	}
@@ -970,15 +821,11 @@ func (m *Msg) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.SessionId)
-	if l > 0 {
-		n += 1 + l + sovProto(uint64(l))
-	}
 	if m.Kind != 0 {
 		n += 1 + sovProto(uint64(m.Kind))
 	}
-	if m.DeviceId != 0 {
-		n += 1 + sovProto(uint64(m.DeviceId))
+	if m.Id != 0 {
+		n += 1 + sovProto(uint64(m.Id))
 	}
 	if m.Ack != 0 {
 		n += 1 + sovProto(uint64(m.Ack))
@@ -1037,19 +884,9 @@ func (this *Cmd) String() string {
 	}
 	s := strings.Join([]string{`&Cmd{`,
 		`Kind:` + fmt.Sprintf("%v", this.Kind) + `,`,
-		`DeviceId:` + fmt.Sprintf("%v", this.DeviceId) + `,`,
+		`Id:` + fmt.Sprintf("%v", this.Id) + `,`,
 		`Seq:` + fmt.Sprintf("%v", this.Seq) + `,`,
 		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *SessionSetCmd) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&SessionSetCmd{`,
-		`SessionId:` + fmt.Sprintf("%v", this.SessionId) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -1059,9 +896,8 @@ func (this *Msg) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&Msg{`,
-		`SessionId:` + fmt.Sprintf("%v", this.SessionId) + `,`,
 		`Kind:` + fmt.Sprintf("%v", this.Kind) + `,`,
-		`DeviceId:` + fmt.Sprintf("%v", this.DeviceId) + `,`,
+		`Id:` + fmt.Sprintf("%v", this.Id) + `,`,
 		`Ack:` + fmt.Sprintf("%v", this.Ack) + `,`,
 		`Payload:` + fmt.Sprintf("%v", this.Payload) + `,`,
 		`}`,
@@ -1155,9 +991,9 @@ func (m *Cmd) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeviceId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
-			m.DeviceId = 0
+			m.Id = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowProto
@@ -1167,7 +1003,7 @@ func (m *Cmd) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DeviceId |= uint64(b&0x7F) << shift
+				m.Id |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1249,91 +1085,6 @@ func (m *Cmd) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *SessionSetCmd) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowProto
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SessionSetCmd: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SessionSetCmd: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SessionId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProto
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProto
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthProto
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SessionId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipProto(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthProto
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthProto
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *Msg) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1364,38 +1115,6 @@ func (m *Msg) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SessionId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProto
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProto
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthProto
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SessionId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Kind", wireType)
 			}
@@ -1414,11 +1133,11 @@ func (m *Msg) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
+		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DeviceId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 			}
-			m.DeviceId = 0
+			m.Id = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowProto
@@ -1428,12 +1147,12 @@ func (m *Msg) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DeviceId |= uint64(b&0x7F) << shift
+				m.Id |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		case 4:
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Ack", wireType)
 			}
@@ -1452,7 +1171,7 @@ func (m *Msg) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Payload", wireType)
 			}

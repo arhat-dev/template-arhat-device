@@ -111,11 +111,11 @@ func (c *Controller) handleSession() {
 			switch cmd.Kind {
 			case arhatgopb.CMD_DEV_CLOSE:
 				c.logger.D("removing device")
-				c.removeDevice(cmd.DeviceId)
+				c.removeDevice(cmd.Id)
 				ret = &arhatgopb.DoneMsg{}
 			case arhatgopb.CMD_DEV_CONNECT:
 				c.logger.D("connecting device")
-				err := c.handleDeviceConnect(cmd.DeviceId, cmd.Payload)
+				err := c.handleDeviceConnect(cmd.Id, cmd.Payload)
 				if err != nil {
 					ret = &arhatgopb.ErrorMsg{Description: err.Error()}
 				} else {
@@ -131,7 +131,7 @@ func (c *Controller) handleSession() {
 					break
 				}
 
-				dev, ok := c.getDevice(cmd.DeviceId)
+				dev, ok := c.getDevice(cmd.Id)
 				if !ok {
 					ret = &arhatgopb.ErrorMsg{Description: "device not found"}
 					break
@@ -145,7 +145,7 @@ func (c *Controller) handleSession() {
 				}
 			}
 
-			msg, err := arhatgopb.NewDeviceMsg(cmd.DeviceId, cmd.Seq, ret)
+			msg, err := arhatgopb.NewDeviceMsg(cmd.Id, cmd.Seq, ret)
 			if err != nil {
 				c.logger.I("failed to marshal msg", log.Error(err))
 				panic(err)

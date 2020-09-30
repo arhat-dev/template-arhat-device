@@ -14,8 +14,6 @@ import (
 func NewDeviceCmd(deviceID, seq uint64, cmd proto.Marshaler) (*Cmd, error) {
 	var kind CmdType
 	switch cmd.(type) {
-	case *SessionSetCmd:
-		kind = CMD_SESSION_SET
 	case *DeviceConnectCmd:
 		kind = CMD_DEV_CONNECT
 	case *DeviceOperateCmd:
@@ -34,10 +32,10 @@ func NewDeviceCmd(deviceID, seq uint64, cmd proto.Marshaler) (*Cmd, error) {
 	}
 
 	return &Cmd{
-		Kind:     kind,
-		DeviceId: deviceID,
-		Seq:      seq,
-		Payload:  data,
+		Kind:    kind,
+		Id:      deviceID,
+		Seq:     seq,
+		Payload: data,
 	}, nil
 }
 
@@ -66,10 +64,10 @@ func NewDeviceMsg(deviceID, ack uint64, msg proto.Marshaler) (*Msg, error) {
 	}
 
 	return &Msg{
-		Kind:     kind,
-		DeviceId: deviceID,
-		Ack:      ack,
-		Payload:  data,
+		Kind:    kind,
+		Id:      deviceID,
+		Ack:     ack,
+		Payload: data,
 	}, nil
 }
 

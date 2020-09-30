@@ -32,7 +32,7 @@ replace (
 )
 
 require (
-	arhat.dev/arhat-proto v0.0.0-20200930004331-ac80a4dbdfb4
+	arhat.dev/arhat-proto v0.0.0-20200930174402-b7b2c57c1e82
 	arhat.dev/pkg v0.0.0-20200930092909-aa3af7acc29c
 	github.com/gogo/protobuf v1.3.1
 	github.com/spf13/cobra v1.0.0
