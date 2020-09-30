@@ -31,25 +31,25 @@ vendor:
 include scripts/test/unit.mk
 
 # binary build
-include scripts/build/template-application-go.mk
+include scripts/build/template-arhat-device.mk
 
 # image
-include scripts/image/template-application-go.mk
+include scripts/image/template-arhat-device.mk
 
 image.build.linux.all: \
-	image.build.template-application-go.linux.all
+	image.build.template-arhat-device.linux.all
 
 image.build.windows.all: \
-	image.build.template-application-go.windows.all
+	image.build.template-arhat-device.windows.all
 
 image.push.linux.all: \
-	image.push.template-application-go.linux.all
+	image.push.template-arhat-device.linux.all
 
 image.push.windows.all: \
-	image.push.template-application-go.windows.all
+	image.push.template-arhat-device.windows.all
 
 # packaging
-include scripts/package/template-application-go.mk
+include scripts/package/template-arhat-device.mk
 
 # optional private scripts
 -include private/scripts.mk

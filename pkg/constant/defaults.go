@@ -17,5 +17,6 @@ limitations under the License.
 package constant
 
 const (
-	DefaultTemplateApplicationGoConfigFile = "/etc/template-application-go/config.yaml"
+	DefaultTemplateArhatDeviceConfigFile = "/etc/template-arhat-device/config.yaml"
+	DefaultArhatDeviceExtensionEndpoint  = "unix:///var/run/arhat.sock"
 )

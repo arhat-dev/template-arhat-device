@@ -4,6 +4,7 @@ run:
   modules-download-mode: vendor
   skip-dirs:
   - vendor
+  - private
   build-tags: []
 
 output:
@@ -50,7 +51,7 @@ linters-settings:
   gocyclo:
     min-complexity: 30
   goimports:
-    local-prefixes: arhat.dev/template-application-go
+    local-prefixes: arhat.dev/template-arhat-device
   lll:
     line-length: 120
     # tab width in spaces. Default to 1.

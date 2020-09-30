@@ -5,7 +5,7 @@
   "SpacesAftertabs": false,
   "NoColor": false,
   "Exclude": [
-    "vendor", "generated"
+    "vendor", "generated", "private"
   ],
   "AllowedContentTypes": [],
   "PassedFiles": [],
