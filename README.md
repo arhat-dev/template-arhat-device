@@ -1,4 +1,4 @@
-# Template Arhat Device
+# Template Arhat Device Go
 
 [![CI](https://github.com/arhat-dev/template-arhat-device/workflows/CI/badge.svg)](https://github.com/arhat-dev/template-arhat-device/actions?query=workflow%3ACI)
 [![Build](https://github.com/arhat-dev/template-arhat-device/workflows/Build/badge.svg)](https://github.com/arhat-dev/template-arhat-device/actions?query=workflow%3ABuild)
@@ -6,7 +6,7 @@
 [![GoReportCard](https://goreportcard.com/badge/arhat.dev/template-arhat-device)](https://goreportcard.com/report/arhat.dev/template-arhat-device)
 [![codecov](https://codecov.io/gh/arhat-dev/template-arhat-device/branch/master/graph/badge.svg)](https://codecov.io/gh/arhat-dev/template-arhat-device)
 
-Template repo for devices integrating with [`arhat`](https://github.com/arhat-dev/arhat) via [`arhat-proto`](https://github.com/arhat-dev/arhat-proto)
+Template repo for devices integrating with [`arhat`](https://github.com/arhat-dev/arhat) via [`arhat-proto`](https://github.com/arhat-dev/arhat-proto) in Go
 
 ## Usage
 
