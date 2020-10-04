@@ -13,10 +13,13 @@ Template repo for extensions integrating with [`arhat`](https://github.com/arhat
 1. Create a new repo using this template
 2. Rename `template-arhat-ext-go` (most importantly, the module name in `go.mod` file) according to your preference
 3. Update application configuration definition in [`pkg/conf`](./pkg/conf/)
-4. Implement your extension by updating code in [`pkg/device`](./pkg/device/)
-5. Update deployment charts in [`cicd/deploy/charts/`](./cicd/deploy/charts/template-arhat-ext-go/)
-6. Document supported device params and metrics (and their params) in [`docs/device.md`](./docs/device.md)
-7. Deploy to somewhere it can communicate with `arhat` (host or container)
+4. Update extension name `my-extension-name` in [`pkg/cmd`](./pkg/cmd/template-arhat-ext-go.go)
+5. Implement your extension by updating code in `pkg/<some name>`
+   - e.g. for device extension: in [`pkg/device`](./pkg/device/)
+6. Update deployment charts in [`cicd/deploy/charts/`](./cicd/deploy/charts/)
+7. Document supported features [`docs`](./docs)
+   - e.g. for device extension: in [`docs/device.md`](./docs/device.md)
+8. Deploy to somewhere it can communicate with `arhat` (host or container)
 
 ## LICENSE
 
