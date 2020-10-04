@@ -21,7 +21,7 @@ import (
 	"arhat.dev/pkg/log"
 	"github.com/spf13/pflag"
 
-	"arhat.dev/template-arhat-device/pkg/constant"
+	"arhat.dev/template-arhat-device-go/pkg/constant"
 )
 
 // nolint:lll

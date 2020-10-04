@@ -3,6 +3,6 @@ ARG ARCH=amd64
 FROM arhatdev/builder-go:alpine as builder
 # TODO: support multiarch build
 FROM mcr.microsoft.com/windows/servercore:ltsc2019
-ARG APP=template-arhat-device
+ARG APP=template-arhat-device-go
 
-ENTRYPOINT [ "/template-arhat-device" ]
+ENTRYPOINT [ "/template-arhat-device-go" ]

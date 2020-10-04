@@ -107,7 +107,7 @@ EOF
   mv "${PACKAGE_DIR}/${pkg_file}" ${BUILD_DIR}/.
 }
 
-package_template_arhat_device() {
+package_template_arhat_device_go() {
   config_file="${PACKAGE_DIR}/${COMP}-${ARCH}.config.yaml"
   cat > "${config_file}" <<EOF
 TODO: add sample config here

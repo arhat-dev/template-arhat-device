@@ -22,7 +22,7 @@ import (
 	"arhat.dev/arhat-proto/arhatgopb"
 	"github.com/gogo/protobuf/proto"
 
-	"arhat.dev/template-arhat-device/pkg/device"
+	"arhat.dev/template-arhat-device-go/pkg/device"
 )
 
 func (c *Controller) handleDeviceConnect(deviceID uint64, data []byte) (err error) {

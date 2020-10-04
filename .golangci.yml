@@ -51,7 +51,7 @@ linters-settings:
   gocyclo:
     min-complexity: 30
   goimports:
-    local-prefixes: arhat.dev/template-arhat-device
+    local-prefixes: arhat.dev/template-arhat-device-go
   lll:
     line-length: 120
     # tab width in spaces. Default to 1.

@@ -25,7 +25,7 @@ import (
 	"arhat.dev/pkg/log"
 	"github.com/gogo/protobuf/proto"
 
-	"arhat.dev/template-arhat-device/pkg/device"
+	"arhat.dev/template-arhat-device-go/pkg/device"
 )
 
 type CmdHandleFunc func(dev *device.Device, payload []byte) (proto.Marshaler, error)

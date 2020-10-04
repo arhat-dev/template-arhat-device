@@ -1,14 +1,14 @@
 ---
-# Source: template-arhat-device/templates/configmap.yaml
+# Source: template-arhat-device-go/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: template-arhat-device
+  name: template-arhat-device-go
   namespace: default
   labels:
-    helm.sh/chart: template-arhat-device-0.1.0
-    app.kubernetes.io/name: template-arhat-device
-    app.kubernetes.io/instance: template-arhat-device
+    helm.sh/chart: template-arhat-device-go-0.1.0
+    app.kubernetes.io/name: template-arhat-device-go
+    app.kubernetes.io/instance: template-arhat-device-go
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
 data:
@@ -26,28 +26,28 @@ data:
         insecureSkipVerify: true
         key: /path/to/client-cert-key
 ---
-# Source: template-arhat-device/templates/daemonset.yaml
+# Source: template-arhat-device-go/templates/daemonset.yaml
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: template-arhat-device
+  name: template-arhat-device-go
   namespace: default
   labels:
-    helm.sh/chart: template-arhat-device-0.1.0
-    app.kubernetes.io/name: template-arhat-device
-    app.kubernetes.io/instance: template-arhat-device
+    helm.sh/chart: template-arhat-device-go-0.1.0
+    app.kubernetes.io/name: template-arhat-device-go
+    app.kubernetes.io/instance: template-arhat-device-go
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: template-arhat-device
-      app.kubernetes.io/instance: template-arhat-device
+      app.kubernetes.io/name: template-arhat-device-go
+      app.kubernetes.io/instance: template-arhat-device-go
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: template-arhat-device
-        app.kubernetes.io/instance: template-arhat-device
+        app.kubernetes.io/name: template-arhat-device-go
+        app.kubernetes.io/instance: template-arhat-device-go
     spec:
       securityContext:
         {}
@@ -60,12 +60,12 @@ spec:
         - name: arhat-device
           securityContext:
             {}
-          image: "docker.io/arhatdev/template-arhat-device:1.16.0"
+          image: "docker.io/arhatdev/template-arhat-device-go:1.16.0"
           imagePullPolicy: IfNotPresent
           command:
-            - /template-arhat-device
+            - /template-arhat-device-go
             - -c
-            - /etc/template-arhat-device/config.yaml
+            - /etc/template-arhat-device-go/config.yaml
           ports:
             - name: http
               containerPort: 80
@@ -80,7 +80,7 @@ spec:
               port: http
           volumeMounts:
             - name: config
-              mountPath: /etc/template-arhat-device
+              mountPath: /etc/template-arhat-device-go
           resources:
             {}
       nodeSelector:
@@ -88,4 +88,4 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: template-arhat-device
+            name: template-arhat-device-go

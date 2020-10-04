@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"arhat.dev/template-arhat-device/pkg/constant"
+	"arhat.dev/template-arhat-device-go/pkg/constant"
 )
 
 func ReadConfig(

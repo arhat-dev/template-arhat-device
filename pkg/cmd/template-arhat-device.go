@@ -32,9 +32,9 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
-	"arhat.dev/template-arhat-device/pkg/conf"
-	"arhat.dev/template-arhat-device/pkg/constant"
-	"arhat.dev/template-arhat-device/pkg/controller"
+	"arhat.dev/template-arhat-device-go/pkg/conf"
+	"arhat.dev/template-arhat-device-go/pkg/constant"
+	"arhat.dev/template-arhat-device-go/pkg/controller"
 )
 
 func NewTemplateArhatDeviceCmd() *cobra.Command {
@@ -46,7 +46,7 @@ func NewTemplateArhatDeviceCmd() *cobra.Command {
 	)
 
 	templateArhatDeviceCmd := &cobra.Command{
-		Use:           "template-arhat-device",
+		Use:           "template-arhat-device-go",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {

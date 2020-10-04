@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "template-arhat-device.fullname" . }}
+  name: {{ include "template-arhat-device-go.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "template-arhat-device.labels" . | nindent 4 }}
+    {{- include "template-arhat-device-go.labels" . | nindent 4 }}
 data:
   config.yaml: |
     {{- .Values.config | toYaml | nindent 4 }}

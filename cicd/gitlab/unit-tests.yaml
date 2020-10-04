@@ -7,12 +7,12 @@
   dependencies:
   - stylecheck
 
-test:unit:linux:template-arhat-device:
+test:unit:linux:template-arhat-device-go:
   extends: .test:unit
   tags:
   - linux
 
-# test:unit:windows:template-arhat-device:
+# test:unit:windows:template-arhat-device-go:
 #   extends: .test:unit
 #   tags:
 #   - windows

@@ -1,4 +1,4 @@
-module arhat.dev/template-arhat-device
+module arhat.dev/template-arhat-device-go
 
 go 1.15
 

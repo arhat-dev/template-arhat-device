@@ -1,9 +1,9 @@
-# Default values for template-arhat-device.
+# Default values for template-arhat-device-go.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 image:
-  repository: docker.io/arhatdev/template-arhat-device
+  repository: docker.io/arhatdev/template-arhat-device-go
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

@@ -22,8 +22,8 @@ import (
 	"os"
 	"time"
 
-	"arhat.dev/template-arhat-device/pkg/cmd"
-	"arhat.dev/template-arhat-device/pkg/version"
+	"arhat.dev/template-arhat-device-go/pkg/cmd"
+	"arhat.dev/template-arhat-device-go/pkg/version"
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 
 	err := rootCmd.Execute()
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to run template-arhat-device %v: %v\n", os.Args, err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to run template-arhat-device-go %v: %v\n", os.Args, err)
 		os.Exit(1)
 	}
 }

@@ -1,4 +1,4 @@
-build:image:linux:template-arhat-device:
+build:image:linux:template-arhat-device-go:
   stage: build-images
   image: docker:stable
   services:
@@ -14,14 +14,14 @@ build:image:linux:template-arhat-device:
   tags:
   - linux
   dependencies:
-  - test:unit:linux:template-arhat-device
+  - test:unit:linux:template-arhat-device-go
 
 # TODO: build windows containers
-# build:image:windows:template-arhat-device:
+# build:image:windows:template-arhat-device-go:
 #   script:
 #   - make image.build.windows.all
 #   - make image.push.windows.all
 #   tags:
 #   - windows
 #   dependencies:
-#   - test:unit:windows:template-arhat-device
+#   - test:unit:windows:template-arhat-device-go
