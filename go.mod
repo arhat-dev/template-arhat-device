@@ -1,4 +1,4 @@
-module arhat.dev/template-arhat-device-go
+module arhat.dev/template-arhat-ext-go
 
 go 1.15
 
@@ -32,11 +32,14 @@ replace (
 )
 
 require (
-	arhat.dev/arhat-proto v0.0.0-20200930174402-b7b2c57c1e82
+	arhat.dev/arhat-proto v0.1.0
+	arhat.dev/libext v0.0.0-20201004191232-8ee7e87c034b
 	arhat.dev/pkg v0.0.0-20200930092909-aa3af7acc29c
 	github.com/gogo/protobuf v1.3.1
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+	go.uber.org/multierr v1.6.0 // indirect
+	go.uber.org/zap v1.16.0 // indirect
+	golang.org/x/sync v0.0.0-20200930132711-30421366ff76
 	gopkg.in/yaml.v2 v2.2.8
 )

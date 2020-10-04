@@ -14,9 +14,9 @@
 
 NS ?= default
 
-gen.manifests.template-arhat-device-go:
+gen.manifests.template-arhat-ext-go:
 	helm template \
-		template-arhat-device-go \
-		cicd/deploy/charts/template-arhat-device-go \
+		template-arhat-ext-go \
+		cicd/deploy/charts/template-arhat-ext-go \
 		--include-crds --namespace ${NS} --debug \
-		| tee cicd/deploy/kube/template-arhat-device-go.yaml
+		| tee cicd/deploy/kube/template-arhat-ext-go.yaml

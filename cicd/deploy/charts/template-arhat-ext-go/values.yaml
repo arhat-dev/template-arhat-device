@@ -1,0 +1,62 @@
+# Default values for template-arhat-ext-go.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository: docker.io/arhatdev/template-arhat-ext-go
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podSecurityContext: {}
+  # fsGroup: 2000
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+config:
+  templateArhatExt:
+    log:
+    - level: verbose
+      format: console
+      file: stderr
+    # - level: info
+    #   format: console
+    #   file: /var/log/abbot.log
+    endpoint: unix:///var/run/arhat.sock
+    tls:
+      enabled: false
+      caCert: /path/to/caCert
+      cert: /path/to/client-cert
+      key: /path/to/client-cert-key
+      # caCertData:
+      # certData:
+      # keyData:
+
+      # serverName: foo
+      insecureSkipVerify: true
+      # cipherSuites:
+      # - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256

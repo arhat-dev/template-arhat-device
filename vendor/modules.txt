@@ -1,6 +1,11 @@
-# arhat.dev/arhat-proto v0.0.0-20200930174402-b7b2c57c1e82
+# arhat.dev/arhat-proto v0.1.0
 ## explicit
 arhat.dev/arhat-proto/arhatgopb
+# arhat.dev/libext v0.0.0-20201004191232-8ee7e87c034b
+## explicit
+arhat.dev/libext
+arhat.dev/libext/codecpb
+arhat.dev/libext/extdevice
 # arhat.dev/pkg v0.0.0-20200930092909-aa3af7acc29c
 ## explicit
 arhat.dev/pkg/confhelper
@@ -133,11 +138,13 @@ go.opentelemetry.io/otel/exporters/trace/jaeger
 go.opentelemetry.io/otel/exporters/trace/jaeger/internal/gen-go/jaeger
 # go.opentelemetry.io/otel/exporters/trace/zipkin v0.6.0
 go.opentelemetry.io/otel/exporters/trace/zipkin
-# go.uber.org/atomic v1.6.0
+# go.uber.org/atomic v1.7.0
 go.uber.org/atomic
-# go.uber.org/multierr v1.5.0
+# go.uber.org/multierr v1.6.0
+## explicit
 go.uber.org/multierr
-# go.uber.org/zap v1.15.0
+# go.uber.org/zap v1.16.0
+## explicit
 go.uber.org/zap
 go.uber.org/zap/buffer
 go.uber.org/zap/internal/bufferpool
@@ -158,7 +165,7 @@ golang.org/x/net/trace
 # golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+# golang.org/x/sync v0.0.0-20200930132711-30421366ff76
 ## explicit
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore

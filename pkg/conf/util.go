@@ -29,14 +29,14 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"arhat.dev/template-arhat-device-go/pkg/constant"
+	"arhat.dev/template-arhat-ext-go/pkg/constant"
 )
 
 func ReadConfig(
 	cmd *cobra.Command,
 	configFile *string,
 	cliLogConfig *log.Config,
-	config *TemplateArhatDeviceConfig,
+	config *TemplateArhatExtConfig,
 ) (context.Context, error) {
 	flags := cmd.Flags()
 	configBytes, err := ioutil.ReadFile(*configFile)
@@ -63,27 +63,27 @@ func ReadConfig(
 		}
 	}
 
-	if len(config.TemplateArhatDevice.Log) > 0 {
+	if len(config.TemplateArhatExt.Log) > 0 {
 		if flags.Changed("log.format") {
-			config.TemplateArhatDevice.Log[0].Format = cliLogConfig.Format
+			config.TemplateArhatExt.Log[0].Format = cliLogConfig.Format
 		}
 
 		if flags.Changed("log.level") {
-			config.TemplateArhatDevice.Log[0].Level = cliLogConfig.Level
+			config.TemplateArhatExt.Log[0].Level = cliLogConfig.Level
 		}
 
 		if flags.Changed("log.file") {
-			config.TemplateArhatDevice.Log[0].File = cliLogConfig.File
+			config.TemplateArhatExt.Log[0].File = cliLogConfig.File
 		}
 	} else {
-		config.TemplateArhatDevice.Log = append(config.TemplateArhatDevice.Log, *cliLogConfig)
+		config.TemplateArhatExt.Log = append(config.TemplateArhatExt.Log, *cliLogConfig)
 	}
 
 	if err = cmd.ParseFlags(os.Args); err != nil {
 		return nil, err
 	}
 
-	err = log.SetDefaultLogger(config.TemplateArhatDevice.Log)
+	err = log.SetDefaultLogger(config.TemplateArhatExt.Log)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set default logger: %w", err)
 	}
