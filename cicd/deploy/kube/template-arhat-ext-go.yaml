@@ -57,7 +57,7 @@ spec:
         - key: node.kubernetes.io/unschedulable
           operator: Exists
       containers:
-        - name: arhat-device
+        - name: arhat-peripheral
           securityContext:
             {}
           image: "docker.io/arhatdev/template-arhat-ext-go:1.16.0"

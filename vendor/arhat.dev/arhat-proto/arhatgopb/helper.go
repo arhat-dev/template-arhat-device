@@ -1,4 +1,4 @@
-// +build !nodev
+// +build !noperipheral
 
 package arhatgopb
 
@@ -11,17 +11,17 @@ import (
 	"github.com/gogo/protobuf/proto"
 )
 
-func NewDeviceCmd(deviceID, seq uint64, cmd proto.Marshaler) (*Cmd, error) {
+func NewCmd(id, seq uint64, cmd proto.Marshaler) (*Cmd, error) {
 	var kind CmdType
 	switch cmd.(type) {
-	case *DeviceConnectCmd:
-		kind = CMD_DEV_CONNECT
-	case *DeviceOperateCmd:
-		kind = CMD_DEV_OPERATE
-	case *DeviceMetricsCollectCmd:
-		kind = CMD_DEV_COLLECT_METRICS
-	case *DeviceCloseCmd:
-		kind = CMD_DEV_CLOSE
+	case *PeripheralConnectCmd:
+		kind = CMD_PERIPHERAL_CONNECT
+	case *PeripheralOperateCmd:
+		kind = CMD_PERIPHERAL_OPERATE
+	case *PeripheralMetricsCollectCmd:
+		kind = CMD_PERIPHERAL_COLLECT_METRICS
+	case *PeripheralCloseCmd:
+		kind = CMD_PERIPHERAL_CLOSE
 	default:
 		return nil, fmt.Errorf("unknown cmd: %v", cmd)
 	}
@@ -33,27 +33,27 @@ func NewDeviceCmd(deviceID, seq uint64, cmd proto.Marshaler) (*Cmd, error) {
 
 	return &Cmd{
 		Kind:    kind,
-		Id:      deviceID,
+		Id:      id,
 		Seq:     seq,
 		Payload: data,
 	}, nil
 }
 
-func NewDeviceMsg(deviceID, ack uint64, msg proto.Marshaler) (*Msg, error) {
+func NewMsg(id, ack uint64, msg proto.Marshaler) (*Msg, error) {
 	var kind MsgType
 	switch msg.(type) {
 	case *RegisterMsg:
 		kind = MSG_REGISTER
-	case *DeviceOperationResultMsg:
-		kind = MSG_DEV_OPERATION_RESULT
-	case *DeviceMetricsMsg:
-		kind = MSG_DEV_METRICS
+	case *PeripheralOperationResultMsg:
+		kind = MSG_PERIPHERAL_OPERATION_RESULT
+	case *PeripheralMetricsMsg:
+		kind = MSG_PERIPHERAL_METRICS
 	case *DoneMsg:
 		kind = MSG_DONE
 	case *ErrorMsg:
 		kind = MSG_ERROR
-	case *DeviceEventMsg:
-		kind = MSG_DEV_EVENTS
+	case *PeripheralEventMsg:
+		kind = MSG_PERIPHERAL_EVENTS
 	default:
 		return nil, fmt.Errorf("unknown msg: %v", msg)
 	}
@@ -65,7 +65,7 @@ func NewDeviceMsg(deviceID, ack uint64, msg proto.Marshaler) (*Msg, error) {
 
 	return &Msg{
 		Kind:    kind,
-		Id:      deviceID,
+		Id:      id,
 		Ack:     ack,
 		Payload: data,
 	}, nil

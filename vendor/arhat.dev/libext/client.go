@@ -18,7 +18,7 @@ import (
 type ExtensionType string
 
 const (
-	ExtensionDevice ExtensionType = "/ext/devices"
+	ExtensionPeripheral ExtensionType = "/peripherals"
 )
 
 func NewClient(
@@ -97,19 +97,14 @@ func (c *Client) ProcessNewStream(
 
 	req.Header.Set("Content-Type", c.codec.ContentType())
 
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to start sync loop for the first time: %w", err)
-	}
-
-	defer func() {
-		_ = resp.Body.Close()
-	}()
-
 	wg, ctx := errgroup.WithContext(c.ctx)
 
 	wg.Go(func() error {
 		enc := c.codec.NewEncoder(pw)
+
+		defer func() {
+			_ = pw.Close()
+		}()
 
 		for msg := range msgCh {
 			err2 := enc.Encode(msg)
@@ -118,10 +113,17 @@ func (c *Client) ProcessNewStream(
 			}
 		}
 
-		_ = pw.Close()
-
 		return io.EOF
 	})
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to start sync loop for the first time: %w", err)
+	}
+
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	wg.Go(func() error {
 		defer func() {

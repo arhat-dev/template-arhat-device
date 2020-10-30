@@ -30,7 +30,7 @@ spec:
         - key: node.kubernetes.io/unschedulable
           operator: Exists
       containers:
-        - name: arhat-device
+        - name: arhat-peripheral
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

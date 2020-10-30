@@ -5,7 +5,7 @@
 [![GoReportCard](https://goreportcard.com/badge/arhat.dev/libext)](https://goreportcard.com/report/arhat.dev/libext)
 [![codecov](https://codecov.io/gh/arhat-dev/libext-go/branch/master/graph/badge.svg)](https://codecov.io/gh/arhat-dev/libext-go)
 
-Library for building [`arhat`](https://github.com/arhat-dev/arhat) extensions in Go with
+Library for building [`arhat`](https://github.com/arhat-dev/arhat) extensions in Go
 
 ## Examples
 

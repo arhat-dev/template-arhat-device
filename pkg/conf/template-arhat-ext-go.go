@@ -25,7 +25,7 @@ import (
 )
 
 // nolint:lll
-type TemplateArhatExtConfig struct {
+type Config struct {
 	TemplateArhatExt AppConfig `json:"templateArhatExt" yaml:"templateArhatExt"`
 }
 
@@ -43,7 +43,7 @@ func FlagsForTemplateArhatExt(prefix string, config *AppConfig) *pflag.FlagSet {
 	fs := pflag.NewFlagSet("app", pflag.ExitOnError)
 
 	fs.StringVar(&config.Endpoint, prefix+"endpoint",
-		constant.DefaultArhatDeviceExtensionEndpoint, "set arhat listen address")
+		constant.DefaultArhatExtensionEndpoint, "set arhat listen address")
 
 	return fs
 }

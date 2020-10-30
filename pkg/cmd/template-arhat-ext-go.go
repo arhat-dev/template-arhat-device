@@ -17,15 +17,16 @@ limitations under the License.
 package cmd
 
 import (
+	"context"
+	"fmt"
+
 	"arhat.dev/libext"
 	"arhat.dev/libext/codecpb"
-	"arhat.dev/libext/extdevice"
+	"arhat.dev/libext/extperipheral"
 	"arhat.dev/pkg/log"
 	"arhat.dev/template-arhat-ext-go/pkg/conf"
 	"arhat.dev/template-arhat-ext-go/pkg/constant"
-	"arhat.dev/template-arhat-ext-go/pkg/device"
-	"context"
-	"fmt"
+	"arhat.dev/template-arhat-ext-go/pkg/peripheral"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +34,7 @@ func NewtemplateArhatExtCmd() *cobra.Command {
 	var (
 		appCtx       context.Context
 		configFile   string
-		config       = new(conf.TemplateArhatExtConfig)
+		config       = new(conf.Config)
 		cliLogConfig = new(log.Config)
 	)
 
@@ -61,14 +62,14 @@ func NewtemplateArhatExtCmd() *cobra.Command {
 
 	flags := templateArhatExtCmd.PersistentFlags()
 
-	flags.StringVarP(&configFile, "config", "c", constant.DefaulttemplateArhatExtConfigFile,
+	flags.StringVarP(&configFile, "config", "c", constant.DefaultTemplateArhatExtConfigFile,
 		"path to the templateArhatExt config file")
 	flags.AddFlagSet(conf.FlagsForTemplateArhatExt("", &config.TemplateArhatExt))
 
 	return templateArhatExtCmd
 }
 
-func run(appCtx context.Context, config *conf.TemplateArhatExtConfig) error {
+func run(appCtx context.Context, config *conf.Config) error {
 	logger := log.Log.WithName("TemplateArhatExt")
 
 	endpoint := config.TemplateArhatExt.Endpoint
@@ -78,13 +79,13 @@ func run(appCtx context.Context, config *conf.TemplateArhatExtConfig) error {
 		return fmt.Errorf("failed to create tls config: %w", err)
 	}
 
-	client, err := libext.NewClient(appCtx, endpoint, tlsConfig, libext.ExtensionDevice, &codecpb.Codec{})
+	client, err := libext.NewClient(appCtx, endpoint, tlsConfig, libext.ExtensionPeripheral, &codecpb.Codec{})
 	if err != nil {
 		return fmt.Errorf("failed to create extension client: %w", err)
 	}
 
 	ctrl, err := libext.NewController(appCtx, "my-extension-name", log.Log.WithName("controller"),
-		extdevice.NewHandler(log.Log.WithName("handler"), &device.SampleDeviceConnector{}),
+		extperipheral.NewHandler(log.Log.WithName("handler"), &peripheral.SamplePeripheralConnector{}),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create extension controller: %w", err)

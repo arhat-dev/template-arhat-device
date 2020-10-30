@@ -14,7 +14,7 @@ func NewController(ctx context.Context, name string, logger log.Interface, h Han
 	reg := &arhatgopb.RegisterMsg{
 		Name: name,
 	}
-	regMsg, err := arhatgopb.NewDeviceMsg(0, 0, reg)
+	regMsg, err := arhatgopb.NewMsg(0, 0, reg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create register message: %w", err)
 	}
@@ -99,7 +99,7 @@ func (c *Controller) handleSession() {
 				ret = &arhatgopb.ErrorMsg{Description: err.Error()}
 			}
 
-			msg, err := arhatgopb.NewDeviceMsg(cmd.Id, cmd.Seq, ret)
+			msg, err := arhatgopb.NewMsg(cmd.Id, cmd.Seq, ret)
 			if err != nil {
 				c.logger.I("failed to marshal response msg",
 					log.Uint64("id", cmd.Id),

@@ -17,6 +17,6 @@ limitations under the License.
 package constant
 
 const (
-	DefaulttemplateArhatExtConfigFile   = "/etc/template-arhat-ext-go/config.yaml"
-	DefaultArhatDeviceExtensionEndpoint = "unix:///var/run/arhat.sock"
+	DefaultTemplateArhatExtConfigFile = "/etc/template-arhat-ext-go/config.yaml"
+	DefaultArhatExtensionEndpoint     = "unix:///var/run/arhat.sock"
 )

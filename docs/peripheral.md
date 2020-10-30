@@ -1,6 +1,6 @@
-# Device
+# Peripheral
 
-## Device Params
+## Peripheral Params
 
 - `foo=<string>`
   - An arbitrary string provided by user

@@ -14,10 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package device
+package peripheral
 
 import (
-	"arhat.dev/libext/extdevice"
 	"crypto/tls"
 	"fmt"
 	"strconv"
@@ -25,34 +24,35 @@ import (
 	"time"
 
 	"arhat.dev/arhat-proto/arhatgopb"
+	"arhat.dev/libext/extperipheral"
 )
 
-var _ extdevice.DeviceConnector = &SampleDeviceConnector{}
+var _ extperipheral.PeripheralConnector = &SamplePeripheralConnector{}
 
-type SampleDeviceConnector struct{}
+type SamplePeripheralConnector struct{}
 
-func (c *SampleDeviceConnector) Connect(
+func (c *SamplePeripheralConnector) Connect(
 	target string, params map[string]string, tlsConfig *arhatgopb.TLSConfig,
-) (extdevice.Device, error) {
-	config, err := resolveDeviceConfig(params, tlsConfig)
+) (extperipheral.Peripheral, error) {
+	config, err := resolvePeripheralConfig(params, tlsConfig)
 	if err != nil {
-		return nil, fmt.Errorf("failed to resolve device config")
+		return nil, fmt.Errorf("failed to resolve peripheral config")
 	}
 
-	return &SampleDevice{
+	return &SamplePeripheral{
 		target: target,
 		config: config,
 	}, nil
 }
 
-var _ extdevice.Device = &SampleDevice{}
+var _ extperipheral.Peripheral = &SamplePeripheral{}
 
-type SampleDevice struct {
+type SamplePeripheral struct {
 	target string
 	config *SampleConfig
 }
 
-func (d *SampleDevice) Operate(params map[string]string, data []byte) ([][]byte, error) {
+func (d *SamplePeripheral) Operate(params map[string]string, data []byte) ([][]byte, error) {
 	var ret [][]byte
 	for k, v := range params {
 		ret = append(ret, []byte(k))
@@ -62,16 +62,16 @@ func (d *SampleDevice) Operate(params map[string]string, data []byte) ([][]byte,
 	return ret, nil
 }
 
-func (d *SampleDevice) CollectMetrics(param map[string]string) ([]*arhatgopb.DeviceMetricsMsg_Value, error) {
+func (d *SamplePeripheral) CollectMetrics(param map[string]string) ([]*arhatgopb.PeripheralMetricsMsg_Value, error) {
 	_ = param
 
-	return []*arhatgopb.DeviceMetricsMsg_Value{
+	return []*arhatgopb.PeripheralMetricsMsg_Value{
 		{Value: float64(d.config.Bar - 1), Timestamp: time.Now().Add(-time.Second).UnixNano()},
 		{Value: float64(d.config.Bar + 1), Timestamp: time.Now().Add(time.Second).UnixNano()},
 	}, nil
 }
 
-func (d *SampleDevice) Close() {}
+func (d *SamplePeripheral) Close() {}
 
 type SampleConfig struct {
 	Foo string
@@ -79,7 +79,7 @@ type SampleConfig struct {
 	TLS *tls.Config
 }
 
-func resolveDeviceConfig(
+func resolvePeripheralConfig(
 	params map[string]string, tlsConfig *arhatgopb.TLSConfig,
 ) (*SampleConfig, error) {
 	ret := &SampleConfig{
