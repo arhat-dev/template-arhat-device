@@ -36,9 +36,6 @@ include scripts/build/template-arhat-ext-go.mk
 # image
 include scripts/image/template-arhat-ext-go.mk
 
-# manifest
-include scripts/gen/manifest.mk
-
 image.build.linux.all: \
 	image.build.template-arhat-ext-go.linux.all
 
@@ -50,6 +47,9 @@ image.push.linux.all: \
 
 image.push.windows.all: \
 	image.push.template-arhat-ext-go.windows.all
+
+# manifest
+include scripts/gen/manifests.mk
 
 # packaging
 include scripts/package/template-arhat-ext-go.mk

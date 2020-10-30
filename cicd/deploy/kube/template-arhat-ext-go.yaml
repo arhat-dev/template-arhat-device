@@ -9,7 +9,7 @@ metadata:
     helm.sh/chart: template-arhat-ext-go-0.1.0
     app.kubernetes.io/name: template-arhat-ext-go
     app.kubernetes.io/instance: template-arhat-ext-go
-    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/version: "latest"
     app.kubernetes.io/managed-by: Helm
 data:
   config.yaml: |
@@ -36,7 +36,7 @@ metadata:
     helm.sh/chart: template-arhat-ext-go-0.1.0
     app.kubernetes.io/name: template-arhat-ext-go
     app.kubernetes.io/instance: template-arhat-ext-go
-    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/version: "latest"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
@@ -60,7 +60,7 @@ spec:
         - name: arhat-peripheral
           securityContext:
             {}
-          image: "docker.io/arhatdev/template-arhat-ext-go:1.16.0"
+          image: "docker.io/arhatdev/template-arhat-ext-go:latest"
           imagePullPolicy: IfNotPresent
           command:
             - /template-arhat-ext-go

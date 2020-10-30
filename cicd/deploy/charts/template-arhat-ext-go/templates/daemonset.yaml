@@ -39,18 +39,18 @@ spec:
             - /template-arhat-ext-go
             - -c
             - /etc/template-arhat-ext-go/config.yaml
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          # ports:
+          #   - name: http
+          #     containerPort: 80
+          #     protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
           volumeMounts:
             - name: config
               mountPath: /etc/template-arhat-ext-go
