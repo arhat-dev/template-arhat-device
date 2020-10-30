@@ -240,3 +240,25 @@ template-arhat-ext-go.aix.ppc64:
 
 template-arhat-ext-go.dragonfly.amd64:
 	sh scripts/build/build.sh $@
+
+template-arhat-ext-go.plan9.amd64:
+	sh scripts/build/build.sh $@
+
+template-arhat-ext-go.plan9.x86:
+	sh scripts/build/build.sh $@
+
+template-arhat-ext-go.plan9.armv5:
+	sh scripts/build/build.sh $@
+
+template-arhat-ext-go.plan9.armv6:
+	sh scripts/build/build.sh $@
+
+template-arhat-ext-go.plan9.armv7:
+	sh scripts/build/build.sh $@
+
+template-arhat-ext-go.plan9.all: \
+	template-arhat-ext-go.plan9.amd64 \
+	template-arhat-ext-go.plan9.armv7 \
+	template-arhat-ext-go.plan9.x86 \
+	template-arhat-ext-go.plan9.armv5 \
+	template-arhat-ext-go.plan9.armv6

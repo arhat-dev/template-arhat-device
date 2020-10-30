@@ -24,10 +24,11 @@ import (
 	"arhat.dev/libext/codecpb"
 	"arhat.dev/libext/extperipheral"
 	"arhat.dev/pkg/log"
+	"github.com/spf13/cobra"
+
 	"arhat.dev/template-arhat-ext-go/pkg/conf"
 	"arhat.dev/template-arhat-ext-go/pkg/constant"
 	"arhat.dev/template-arhat-ext-go/pkg/peripheral"
-	"github.com/spf13/cobra"
 )
 
 func NewtemplateArhatExtCmd() *cobra.Command {
