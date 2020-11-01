@@ -45,7 +45,7 @@ func (c *SamplePeripheralConnector) Connect(
 	}, nil
 }
 
-var _ extperipheral.Peripheral = &SamplePeripheral{}
+var _ extperipheral.Peripheral = (*SamplePeripheral)(nil)
 
 type SamplePeripheral struct {
 	target string

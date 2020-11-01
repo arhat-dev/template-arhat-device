@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	"arhat.dev/arhat-proto/arhatgopb"
 	"arhat.dev/libext"
 	"arhat.dev/libext/codecpb"
 	"arhat.dev/libext/extperipheral"
@@ -31,7 +32,7 @@ import (
 	"arhat.dev/template-arhat-ext-go/pkg/peripheral"
 )
 
-func NewtemplateArhatExtCmd() *cobra.Command {
+func NewTemplateArhatExtCmd() *cobra.Command {
 	var (
 		appCtx       context.Context
 		configFile   string
@@ -80,12 +81,20 @@ func run(appCtx context.Context, config *conf.Config) error {
 		return fmt.Errorf("failed to create tls config: %w", err)
 	}
 
-	client, err := libext.NewClient(appCtx, endpoint, tlsConfig, libext.ExtensionPeripheral, &codecpb.Codec{})
+	client, err := libext.NewClient(
+		appCtx,
+		arhatgopb.EXTENSION_PERIPHERAL,
+		"my-extension-name",
+		new(codecpb.Codec),
+		nil,
+		endpoint,
+		tlsConfig,
+	)
 	if err != nil {
 		return fmt.Errorf("failed to create extension client: %w", err)
 	}
 
-	ctrl, err := libext.NewController(appCtx, "my-extension-name", log.Log.WithName("controller"),
+	ctrl, err := libext.NewController(appCtx, log.Log.WithName("controller"),
 		extperipheral.NewHandler(log.Log.WithName("handler"), &peripheral.SamplePeripheralConnector{}),
 	)
 	if err != nil {

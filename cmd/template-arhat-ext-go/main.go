@@ -29,7 +29,7 @@ import (
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	rootCmd := cmd.NewtemplateArhatExtCmd()
+	rootCmd := cmd.NewTemplateArhatExtCmd()
 	rootCmd.AddCommand(version.NewVersionCmd())
 
 	err := rootCmd.Execute()
