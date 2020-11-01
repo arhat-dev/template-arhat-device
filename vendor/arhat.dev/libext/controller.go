@@ -2,28 +2,23 @@ package libext
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"arhat.dev/arhat-proto/arhatgopb"
 	"arhat.dev/pkg/log"
+
+	"arhat.dev/libext/types"
 )
 
 // NewController creates a hub for message send/receive
-func NewController(ctx context.Context, name string, logger log.Interface, h Handler) (*Controller, error) {
-	reg := &arhatgopb.RegisterMsg{
-		Name: name,
-	}
-	regMsg, err := arhatgopb.NewMsg(0, 0, reg)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create register message: %w", err)
-	}
-
+func NewController(
+	ctx context.Context,
+	logger log.Interface,
+	h types.Handler,
+) (*Controller, error) {
 	return &Controller{
 		ctx:    ctx,
 		logger: logger,
-
-		regMsg: regMsg,
 
 		handler:     h,
 		chRefreshed: make(chan *channelBundle, 1),
@@ -35,9 +30,7 @@ type Controller struct {
 	ctx    context.Context
 	logger log.Interface
 
-	regMsg *arhatgopb.Msg
-
-	handler     Handler
+	handler     types.Handler
 	currentCB   *channelBundle
 	chRefreshed chan *channelBundle
 
@@ -78,12 +71,6 @@ func (c *Controller) handleSession() {
 			case <-c.ctx.Done():
 				return false
 			}
-		}
-
-		c.logger.I("registering myself")
-		if !sendMsg(c.regMsg) {
-			c.logger.I("failed to send registration msg")
-			continue
 		}
 
 		c.logger.I("receiving cmds")
@@ -128,6 +115,8 @@ func (c *Controller) Close() {
 	}
 }
 
+// RefreshChannels creates a new cmd and msg channel pair for new connection
+// usually this function is called in conjunction with Client.ProcessNewStream
 func (c *Controller) RefreshChannels() (cmdCh chan<- *arhatgopb.Cmd, msgCh <-chan *arhatgopb.Msg) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

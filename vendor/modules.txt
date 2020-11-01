@@ -1,16 +1,17 @@
-# arhat.dev/arhat-proto v0.1.1
+# arhat.dev/arhat-proto v0.2.1
 ## explicit
 arhat.dev/arhat-proto/arhatgopb
-# arhat.dev/libext v0.1.0
+# arhat.dev/libext v0.2.0
 ## explicit
 arhat.dev/libext
 arhat.dev/libext/codecpb
 arhat.dev/libext/extperipheral
+arhat.dev/libext/types
+arhat.dev/libext/util
 # arhat.dev/pkg v0.0.0-20201011023427-3d85bac95f31
 ## explicit
 arhat.dev/pkg/confhelper
 arhat.dev/pkg/envhelper
-arhat.dev/pkg/iohelper
 arhat.dev/pkg/log
 # github.com/DataDog/sketches-go v0.0.0-20190923095040-43f19ad77ff7
 github.com/DataDog/sketches-go/ddsketch
@@ -71,6 +72,19 @@ github.com/open-telemetry/opentelemetry-proto/gen/go/resource/v1
 github.com/open-telemetry/opentelemetry-proto/gen/go/trace/v1
 # github.com/openzipkin/zipkin-go v0.2.2
 github.com/openzipkin/zipkin-go/model
+# github.com/pion/dtls/v2 v2.0.3
+github.com/pion/dtls/v2
+github.com/pion/dtls/v2/internal/closer
+github.com/pion/dtls/v2/internal/net/connctx
+github.com/pion/dtls/v2/pkg/crypto/ccm
+# github.com/pion/logging v0.2.2
+github.com/pion/logging
+# github.com/pion/transport v0.10.1
+github.com/pion/transport/deadline
+github.com/pion/transport/packetio
+github.com/pion/transport/replaydetector
+# github.com/pion/udp v0.1.0
+github.com/pion/udp
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
 # github.com/prometheus/client_golang v1.5.0
@@ -150,9 +164,12 @@ go.uber.org/zap/internal/bufferpool
 go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
-# golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9
+# golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
+golang.org/x/crypto/cryptobyte
+golang.org/x/crypto/cryptobyte/asn1
+golang.org/x/crypto/curve25519
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20191004110552-13f9640d40b9
+# golang.org/x/net v0.0.0-20200822124328-c89045814202
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 golang.org/x/net/http/httpguts
@@ -178,6 +195,9 @@ golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 # golang.org/x/time v0.0.0-20190308202827-9d24e82272b4
 golang.org/x/time/rate
+# golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
+golang.org/x/xerrors
+golang.org/x/xerrors/internal
 # google.golang.org/api v0.20.0
 google.golang.org/api/support/bundler
 # google.golang.org/appengine v1.6.1
