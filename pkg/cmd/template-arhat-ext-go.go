@@ -82,11 +82,12 @@ func run(appCtx context.Context, config *conf.Config) error {
 		return fmt.Errorf("failed to create tls config: %w", err)
 	}
 
+	c := codec.GetCodec(arhatgopb.CODEC_PROTOBUF)
 	client, err := libext.NewClient(
 		appCtx,
 		arhatgopb.EXTENSION_PERIPHERAL,
 		"my-extension-name",
-		codec.GetCodec(arhatgopb.CODEC_PROTOBUF),
+		c,
 		nil,
 		endpoint,
 		tlsConfig,
@@ -95,8 +96,12 @@ func run(appCtx context.Context, config *conf.Config) error {
 		return fmt.Errorf("failed to create extension client: %w", err)
 	}
 
-	ctrl, err := libext.NewController(appCtx, log.Log.WithName("controller"),
-		extperipheral.NewHandler(log.Log.WithName("handler"), &peripheral.SamplePeripheralConnector{}),
+	ctrl, err := libext.NewController(appCtx, log.Log.WithName("controller"), c.Marshal,
+		extperipheral.NewHandler(
+			log.Log.WithName("handler"),
+			c.Unmarshal,
+			&peripheral.SamplePeripheralConnector{},
+		),
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create extension controller: %w", err)

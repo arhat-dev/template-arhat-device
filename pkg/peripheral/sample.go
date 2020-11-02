@@ -105,13 +105,5 @@ func resolvePeripheralConfig(
 		}
 	}
 
-	if tlsConfig != nil {
-		var err error
-		ret.TLS, err = tlsConfig.GetTLSConfig()
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	return ret, nil
 }
