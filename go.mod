@@ -32,12 +32,10 @@ replace (
 )
 
 require (
-	arhat.dev/arhat-proto v0.2.1
-	arhat.dev/libext v0.2.0
-	arhat.dev/pkg v0.0.0-20201011023427-3d85bac95f31
+	arhat.dev/arhat-proto v0.3.1
+	arhat.dev/libext v0.3.0
+	arhat.dev/pkg v0.1.1
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
-	go.uber.org/multierr v1.6.0 // indirect
-	go.uber.org/zap v1.16.0 // indirect
-	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 v2.3.0
 )

@@ -1,9 +1,23 @@
+/*
+Copyright 2020 The arhat.dev Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package libext
 
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -15,6 +29,7 @@ import (
 	"github.com/pion/dtls/v2"
 	"golang.org/x/sync/errgroup"
 
+	"arhat.dev/libext/codec"
 	"arhat.dev/libext/types"
 	"arhat.dev/libext/util"
 )
@@ -27,7 +42,7 @@ func NewClient(
 	ctx context.Context,
 	kind arhatgopb.ExtensionType,
 	name string,
-	codec types.Codec,
+	c types.Codec,
 
 	// connection management
 	dialer *net.Dialer,
@@ -39,17 +54,17 @@ func NewClient(
 		return nil, fmt.Errorf("invalid endpoint url: %w", err)
 	}
 
-	reg := &arhatgopb.RegisterMsg{
+	marshal := codec.GetCodec(arhatgopb.CODEC_JSON).Marshal
+	regMsg, err := util.NewMsg(marshal, arhatgopb.MSG_REGISTER, 0, 0, &arhatgopb.RegisterMsg{
 		Name:          name,
 		ExtensionType: kind,
-		Codec:         codec.Type(),
-	}
-	regMsg, err := arhatgopb.NewMsg(0, 0, reg)
+		Codec:         c.Type(),
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create register message: %w", err)
 	}
 
-	regMsgBytes, err := json.Marshal(regMsg)
+	regMsgBytes, err := marshal(regMsg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal register message: %w", err)
 	}
@@ -99,34 +114,38 @@ func NewClient(
 	return &Client{
 		ctx: ctx,
 
-		codec:  codec,
+		codec:  c,
 		regMsg: regMsgBytes,
 
-		createConnection: func() (conn net.Conn, err error) {
-			conn, err = connector()
+		createConnection: func() (_ net.Conn, err error) {
+			var innerConn net.Conn
+
+			innerConn, err = connector()
 			if err != nil {
 				return nil, err
 			}
 			if tlsConfig == nil {
-				return conn, nil
+				return innerConn, nil
 			}
 
 			defer func() {
 				if err != nil {
-					_ = conn.Close()
+					_ = innerConn.Close()
 				}
 			}()
 
-			_, isPktConn := conn.(net.PacketConn)
-			if isPktConn {
+			// tls enabled
+			_, isUDPConn := innerConn.(*net.UDPConn)
+			if isUDPConn {
+				// currently only udp supports dtls
 				dtlsConfig := util.ConvertTLSConfigToDTLSConfig(tlsConfig)
 				dtlsConfig.ConnectContextMaker = func() (context.Context, func()) {
 					return context.WithCancel(ctx)
 				}
-				return dtls.ClientWithContext(ctx, conn, dtlsConfig)
+				return dtls.ClientWithContext(ctx, innerConn, dtlsConfig)
 			}
 
-			return tls.Client(conn, tlsConfig), nil
+			return tls.Client(innerConn, tlsConfig), nil
 		},
 	}, nil
 }
@@ -164,15 +183,25 @@ func (c *Client) ProcessNewStream(
 
 	wg, ctx := errgroup.WithContext(c.ctx)
 
+	keepaliveCh := make(chan struct{})
 	wg.Go(func() error {
-		enc := c.codec.NewEncoder(conn)
-
 		defer func() {
 			_ = conn.Close()
 		}()
 
+		enc := c.codec.NewEncoder(conn)
 		for {
 			select {
+			case _, more := <-keepaliveCh:
+				if !more {
+					return io.EOF
+				}
+				err2 := enc.Encode(&arhatgopb.Msg{
+					Kind: arhatgopb.MSG_PONG,
+				})
+				if err2 != nil {
+					return fmt.Errorf("failed to encode pong message: %w", err2)
+				}
 			case msg, more := <-msgCh:
 				if !more {
 					return nil
@@ -189,6 +218,7 @@ func (c *Client) ProcessNewStream(
 
 	wg.Go(func() error {
 		defer func() {
+			close(keepaliveCh)
 			close(cmdCh)
 		}()
 
@@ -198,6 +228,15 @@ func (c *Client) ProcessNewStream(
 			err2 := checkNetworkReadErr(dec.Decode(cmd))
 			if err2 != nil {
 				return err2
+			}
+
+			if cmd.Kind == arhatgopb.CMD_PING {
+				select {
+				case keepaliveCh <- struct{}{}:
+				case <-ctx.Done():
+					return nil
+				}
+				continue
 			}
 
 			select {

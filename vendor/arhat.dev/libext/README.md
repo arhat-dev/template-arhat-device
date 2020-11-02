@@ -7,9 +7,30 @@
 
 Library for building [`arhat`](https://github.com/arhat-dev/arhat) extensions in Go
 
-## Examples
+## Support Matrix
 
-- TL;DR, create a project using this template: [`template-arhat-ext-go`](https://github.com/arhat-dev/template-arhat-ext-go)
+- Protocols: `tcp`, `tcp-tls`, `udp`, `udp-dtls`, `unix`, `unix-tls`
+- Codec: `json`, `protobuf`
+
+please refer to [Benchmark](#benchmark) for performance evaluation of different combinations
+
+## Usage
+
+### Controller for Extension (Client)
+
+__TL;DR__: create a project using this template: [`template-arhat-ext-go`](https://github.com/arhat-dev/template-arhat-ext-go) or have a look at [`examples/client_example_test.go`](./examples/client_example_test.go)
+
+### Extension Hub (Server)
+
+__TL;DR__: have a look at [`examples/server_example_test.go`](./examples/server_example_test.go)
+
+### Benchmark
+
+You can find reference benchmark results in CI log, to run it locally:
+
+```bash
+make test.benchmark
+```
 
 ## LICENSE
 

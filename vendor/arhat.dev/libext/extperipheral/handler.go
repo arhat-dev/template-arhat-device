@@ -1,3 +1,18 @@
+/*
+Copyright 2020 The arhat.dev Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package extperipheral
 
 import (
@@ -6,14 +21,17 @@ import (
 
 	"arhat.dev/arhat-proto/arhatgopb"
 	"arhat.dev/pkg/log"
-	"github.com/gogo/protobuf/proto"
+
+	"arhat.dev/libext/types"
 )
 
-type cmdHandleFunc func(p Peripheral, payload []byte) (proto.Marshaler, error)
+type cmdHandleFunc func(p Peripheral, payload []byte) (interface{}, error)
 
-func NewHandler(logger log.Interface, impl PeripheralConnector) *Handler {
+func NewHandler(logger log.Interface, unmarshal types.UnmarshalFunc, impl PeripheralConnector) *Handler {
 	return &Handler{
-		logger:      logger,
+		logger: logger,
+
+		unmarshal:   unmarshal,
 		impl:        impl,
 		peripherals: new(sync.Map),
 	}
@@ -22,11 +40,14 @@ func NewHandler(logger log.Interface, impl PeripheralConnector) *Handler {
 type Handler struct {
 	logger log.Interface
 
+	unmarshal   types.UnmarshalFunc
 	impl        PeripheralConnector
 	peripherals *sync.Map
 }
 
-func (c *Handler) HandleCmd(id uint64, kind arhatgopb.CmdType, payload []byte) (proto.Marshaler, error) {
+func (c *Handler) HandleCmd(
+	id uint64, kind arhatgopb.CmdType, payload []byte,
+) (interface{}, error) {
 	handlerMap := map[arhatgopb.CmdType]cmdHandleFunc{
 		arhatgopb.CMD_PERIPHERAL_OPERATE:         c.handlePeripheralOperate,
 		arhatgopb.CMD_PERIPHERAL_COLLECT_METRICS: c.handlePeripheralMetricsCollect,
@@ -67,13 +88,13 @@ func (c *Handler) HandleCmd(id uint64, kind arhatgopb.CmdType, payload []byte) (
 	}
 }
 
-func (c *Handler) handlePeripheralConnect(peripheralID uint64, data []byte) (err error) {
+func (c *Handler) handlePeripheralConnect(peripheralID uint64, payload []byte) (err error) {
 	if _, loaded := c.peripherals.Load(peripheralID); loaded {
 		return fmt.Errorf("invalid duplicate peripheral id")
 	}
 
 	spec := new(arhatgopb.PeripheralConnectCmd)
-	err = spec.Unmarshal(data)
+	err = c.unmarshal(payload, spec)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal PeripheralConnectCmd: %w", err)
 	}
@@ -120,9 +141,9 @@ func (c *Handler) removePeripheral(peripheralID uint64) {
 	c.peripherals.Delete(peripheralID)
 }
 
-func (c *Handler) handlePeripheralOperate(p Peripheral, payload []byte) (proto.Marshaler, error) {
+func (c *Handler) handlePeripheralOperate(p Peripheral, payload []byte) (interface{}, error) {
 	spec := new(arhatgopb.PeripheralOperateCmd)
-	err := spec.Unmarshal(payload)
+	err := c.unmarshal(payload, spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal PeripheralOperateCmd: %w", err)
 	}
@@ -135,9 +156,9 @@ func (c *Handler) handlePeripheralOperate(p Peripheral, payload []byte) (proto.M
 	return &arhatgopb.PeripheralOperationResultMsg{Result: ret}, nil
 }
 
-func (c *Handler) handlePeripheralMetricsCollect(p Peripheral, payload []byte) (proto.Marshaler, error) {
+func (c *Handler) handlePeripheralMetricsCollect(p Peripheral, payload []byte) (interface{}, error) {
 	spec := new(arhatgopb.PeripheralMetricsCollectCmd)
-	err := spec.Unmarshal(payload)
+	err := c.unmarshal(payload, spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal PeripheralMetricsCollectCmd: %w", err)
 	}

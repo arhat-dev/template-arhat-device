@@ -22,7 +22,8 @@ import (
 
 	"arhat.dev/arhat-proto/arhatgopb"
 	"arhat.dev/libext"
-	"arhat.dev/libext/codecpb"
+	"arhat.dev/libext/codec"
+	_ "arhat.dev/libext/codec/codecpb"
 	"arhat.dev/libext/extperipheral"
 	"arhat.dev/pkg/log"
 	"github.com/spf13/cobra"
@@ -85,7 +86,7 @@ func run(appCtx context.Context, config *conf.Config) error {
 		appCtx,
 		arhatgopb.EXTENSION_PERIPHERAL,
 		"my-extension-name",
-		new(codecpb.Codec),
+		codec.GetCodec(arhatgopb.CODEC_PROTOBUF),
 		nil,
 		endpoint,
 		tlsConfig,

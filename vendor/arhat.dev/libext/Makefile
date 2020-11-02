@@ -18,3 +18,4 @@ tidy:
 
 include scripts/test.mk
 include scripts/lint.mk
+include scripts/gen.mk

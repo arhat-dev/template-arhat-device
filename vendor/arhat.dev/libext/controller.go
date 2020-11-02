@@ -1,28 +1,50 @@
+/*
+Copyright 2020 The arhat.dev Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package libext
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"arhat.dev/arhat-proto/arhatgopb"
 	"arhat.dev/pkg/log"
 
 	"arhat.dev/libext/types"
+	"arhat.dev/libext/util"
 )
 
 // NewController creates a hub for message send/receive
 func NewController(
 	ctx context.Context,
 	logger log.Interface,
+	marshal types.MarshalFunc,
 	h types.Handler,
 ) (*Controller, error) {
 	return &Controller{
 		ctx:    ctx,
 		logger: logger,
 
+		marshal:     marshal,
 		handler:     h,
+		currentCB:   nil,
 		chRefreshed: make(chan *channelBundle, 1),
-		mu:          new(sync.RWMutex),
+
+		closed: false,
+		mu:     new(sync.RWMutex),
 	}, nil
 }
 
@@ -30,6 +52,7 @@ type Controller struct {
 	ctx    context.Context
 	logger log.Interface
 
+	marshal     types.MarshalFunc
 	handler     types.Handler
 	currentCB   *channelBundle
 	chRefreshed chan *channelBundle
@@ -61,50 +84,52 @@ func (c *Controller) handleSession() {
 
 		// new session, register first
 
-		sendMsg := func(msg *arhatgopb.Msg) (sent bool) {
+		sendMsg := func(msg *arhatgopb.Msg) error {
 			c.logger.V("sending msg")
 			select {
 			case <-cb.closed:
-				return false
+				return nil
 			case cb.msgCh <- msg:
-				return true
+				return nil
 			case <-c.ctx.Done():
-				return false
+				return c.ctx.Err()
 			}
 		}
 
-		c.logger.I("receiving cmds")
-	loop:
-		// cmdCh will be closed once RefreshChannels called
-		for cmd := range cb.cmdCh {
-			ret, err := c.handler.HandleCmd(cmd.Id, cmd.Kind, cmd.Payload)
-			if err != nil {
-				c.logger.I("error happened when handling cmd",
-					log.Uint64("id", cmd.Id),
-					log.String("kind", cmd.Kind.String()),
-				)
-				ret = &arhatgopb.ErrorMsg{Description: err.Error()}
-			}
+		c.logger.D("receiving commands")
+		err := func() error {
+			// cmdCh will be closed once RefreshChannels called
+			for cmd := range cb.cmdCh {
+				ret, err := c.handler.HandleCmd(cmd.Id, cmd.Kind, cmd.Payload)
+				if err != nil {
+					ret = &arhatgopb.ErrorMsg{Description: err.Error()}
+				}
 
-			msg, err := arhatgopb.NewMsg(cmd.Id, cmd.Seq, ret)
-			if err != nil {
-				c.logger.I("failed to marshal response msg",
-					log.Uint64("id", cmd.Id),
-					log.Error(err),
-				)
+				kind := util.GetMsgType(ret)
+				if kind == 0 {
+					return fmt.Errorf("unknown response msg")
+				}
 
-				// should not happen
-				break loop
-			}
+				msg, err := util.NewMsg(c.marshal, kind, cmd.Id, cmd.Seq, ret)
+				if err != nil {
+					return fmt.Errorf("failed to marshal response msg")
+				}
 
-			if !sendMsg(msg) {
-				// not sent, connection error wait for channel refresh
-				break loop
+				err = sendMsg(msg)
+				if err != nil {
+					return err
+				}
 			}
+			return nil
+		}()
+
+		if err != nil {
+			cb.Close()
 		}
 	}
 }
 
+// Close controller, will not handle incoming commands anymore
 func (c *Controller) Close() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -122,6 +147,11 @@ func (c *Controller) RefreshChannels() (cmdCh chan<- *arhatgopb.Cmd, msgCh <-cha
 	defer c.mu.Unlock()
 
 	cb := newChannelBundle()
+	if c.closed {
+		// return a closed msg channel since we have been closed before
+		cb.Close()
+		return cb.cmdCh, cb.msgCh
+	}
 
 	select {
 	case <-c.ctx.Done():
