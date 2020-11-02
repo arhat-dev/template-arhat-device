@@ -23,7 +23,6 @@ import (
 	"arhat.dev/arhat-proto/arhatgopb"
 	"arhat.dev/libext"
 	"arhat.dev/libext/codec"
-	_ "arhat.dev/libext/codec/codecpb"
 	"arhat.dev/libext/extperipheral"
 	"arhat.dev/pkg/log"
 	"github.com/spf13/cobra"
@@ -31,6 +30,9 @@ import (
 	"arhat.dev/template-arhat-ext-go/pkg/conf"
 	"arhat.dev/template-arhat-ext-go/pkg/constant"
 	"arhat.dev/template-arhat-ext-go/pkg/peripheral"
+
+	// Add protobuf codec support
+	_ "arhat.dev/libext/codec/codecpb"
 )
 
 func NewTemplateArhatExtCmd() *cobra.Command {

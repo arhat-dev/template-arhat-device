@@ -105,5 +105,6 @@ func resolvePeripheralConfig(
 		}
 	}
 
+	_ = tlsConfig
 	return ret, nil
 }
