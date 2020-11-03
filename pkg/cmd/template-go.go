@@ -27,15 +27,15 @@ import (
 	"arhat.dev/pkg/log"
 	"github.com/spf13/cobra"
 
-	"arhat.dev/template-arhat-ext-go/pkg/conf"
-	"arhat.dev/template-arhat-ext-go/pkg/constant"
-	"arhat.dev/template-arhat-ext-go/pkg/peripheral"
+	"ext.arhat.dev/template-go/pkg/conf"
+	"ext.arhat.dev/template-go/pkg/constant"
+	"ext.arhat.dev/template-go/pkg/peripheral"
 
 	// Add protobuf codec support
 	_ "arhat.dev/libext/codec/codecpb"
 )
 
-func NewTemplateArhatExtCmd() *cobra.Command {
+func NewTemplateGoCmd() *cobra.Command {
 	var (
 		appCtx       context.Context
 		configFile   string
@@ -43,8 +43,8 @@ func NewTemplateArhatExtCmd() *cobra.Command {
 		cliLogConfig = new(log.Config)
 	)
 
-	templateArhatExtCmd := &cobra.Command{
-		Use:           "template-arhat-ext-go",
+	templateGoCmd := &cobra.Command{
+		Use:           "template-go",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
@@ -65,21 +65,21 @@ func NewTemplateArhatExtCmd() *cobra.Command {
 		},
 	}
 
-	flags := templateArhatExtCmd.PersistentFlags()
+	flags := templateGoCmd.PersistentFlags()
 
-	flags.StringVarP(&configFile, "config", "c", constant.DefaultTemplateArhatExtConfigFile,
-		"path to the templateArhatExt config file")
-	flags.AddFlagSet(conf.FlagsForTemplateArhatExt("", &config.TemplateArhatExt))
+	flags.StringVarP(&configFile, "config", "c", constant.DefaultTemplateGoConfigFile,
+		"path to the templateGo config file")
+	flags.AddFlagSet(conf.FlagsForTemplateGo("", &config.TemplateGo))
 
-	return templateArhatExtCmd
+	return templateGoCmd
 }
 
 func run(appCtx context.Context, config *conf.Config) error {
-	logger := log.Log.WithName("TemplateArhatExt")
+	logger := log.Log.WithName("TemplateGo")
 
-	endpoint := config.TemplateArhatExt.Endpoint
+	endpoint := config.TemplateGo.Endpoint
 
-	tlsConfig, err := config.TemplateArhatExt.TLS.GetTLSConfig(false)
+	tlsConfig, err := config.TemplateGo.TLS.GetTLSConfig(false)
 	if err != nil {
 		return fmt.Errorf("failed to create tls config: %w", err)
 	}

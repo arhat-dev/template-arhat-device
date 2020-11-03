@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: {{ include "template-arhat-ext-go.fullname" . }}
+  name: {{ include "template-go.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "template-arhat-ext-go.labels" . | nindent 4 }}
+    {{- include "template-go.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "template-arhat-ext-go.selectorLabels" . | nindent 6 }}
+      {{- include "template-go.selectorLabels" . | nindent 6 }}
   template:
     metadata:
     {{- with .Values.podAnnotations }}
@@ -16,7 +16,7 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       labels:
-        {{- include "template-arhat-ext-go.selectorLabels" . | nindent 8 }}
+        {{- include "template-go.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -36,9 +36,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - /template-arhat-ext-go
+            - /template-go
             - -c
-            - /etc/template-arhat-ext-go/config.yaml
+            - /etc/template-go/config.yaml
           # ports:
           #   - name: http
           #     containerPort: 80
@@ -53,7 +53,7 @@ spec:
           #     port: http
           volumeMounts:
             - name: config
-              mountPath: /etc/template-arhat-ext-go
+              mountPath: /etc/template-go
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       nodeSelector:
@@ -72,4 +72,4 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "template-arhat-ext-go.fullname" . }}
+            name: {{ include "template-go.fullname" . }}

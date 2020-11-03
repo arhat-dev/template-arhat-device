@@ -30,9 +30,9 @@ _build() {
   eval "$1"
 }
 
-template_arhat_ext_go() {
+template_go() {
   # TODO: set mandatory tags and predefined tags for specific platforms
-  _build "${GOBUILD} -tags='nokube nocloud netgo ${PREDEFINED_BUILD_TAGS} ${TAGS}' ./cmd/template-arhat-ext-go"
+  _build "${GOBUILD} -tags='nokube nocloud netgo ${PREDEFINED_BUILD_TAGS} ${TAGS}' ./cmd/template-go"
 }
 
 COMP=$(printf "%s" "$@" | cut -d. -f1)
@@ -160,11 +160,11 @@ fi
 CGO_FLAGS="CC=${CC} CXX=${CXX} CC_FOR_TARGET=${CC} CXX_FOR_TARGET=${CXX} CGO_CFLAGS_ALLOW='-W' CGO_CFLAGS='${CFLAGS}' CGO_LDFLAGS='${LDFLAGS}'"
 
 GO_LDFLAGS="-s -w \
-  -X arhat.dev/template-arhat-ext-go/pkg/version.branch=${GIT_BRANCH} \
-  -X arhat.dev/template-arhat-ext-go/pkg/version.commit=${GIT_COMMIT} \
-  -X arhat.dev/template-arhat-ext-go/pkg/version.tag=${GIT_TAG} \
-  -X arhat.dev/template-arhat-ext-go/pkg/version.arch=${ARCH} \
-  -X arhat.dev/template-arhat-ext-go/pkg/version.goCompilerPlatform=$(go version | cut -d\  -f4)"
+  -X ext.arhat.dev/template-go/pkg/version.branch=${GIT_BRANCH} \
+  -X ext.arhat.dev/template-go/pkg/version.commit=${GIT_COMMIT} \
+  -X ext.arhat.dev/template-go/pkg/version.tag=${GIT_TAG} \
+  -X ext.arhat.dev/template-go/pkg/version.arch=${ARCH} \
+  -X ext.arhat.dev/template-go/pkg/version.goCompilerPlatform=$(go version | cut -d\  -f4)"
 
 GOARM="$(_get_goarm "${ARCH}")"
 if [ -z "${GOARM}" ]; then

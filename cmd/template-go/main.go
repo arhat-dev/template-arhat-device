@@ -22,19 +22,19 @@ import (
 	"os"
 	"time"
 
-	"arhat.dev/template-arhat-ext-go/pkg/cmd"
-	"arhat.dev/template-arhat-ext-go/pkg/version"
+	"ext.arhat.dev/template-go/pkg/cmd"
+	"ext.arhat.dev/template-go/pkg/version"
 )
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	rootCmd := cmd.NewTemplateArhatExtCmd()
+	rootCmd := cmd.NewTemplateGoCmd()
 	rootCmd.AddCommand(version.NewVersionCmd())
 
 	err := rootCmd.Execute()
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "failed to run template-arhat-ext-go %v: %v\n", os.Args, err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to run template-go %v: %v\n", os.Args, err)
 		os.Exit(1)
 	}
 }

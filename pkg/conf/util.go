@@ -29,7 +29,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"arhat.dev/template-arhat-ext-go/pkg/constant"
+	"ext.arhat.dev/template-go/pkg/constant"
 )
 
 func ReadConfig(
@@ -63,27 +63,27 @@ func ReadConfig(
 		}
 	}
 
-	if len(config.TemplateArhatExt.Log) > 0 {
+	if len(config.TemplateGo.Log) > 0 {
 		if flags.Changed("log.format") {
-			config.TemplateArhatExt.Log[0].Format = cliLogConfig.Format
+			config.TemplateGo.Log[0].Format = cliLogConfig.Format
 		}
 
 		if flags.Changed("log.level") {
-			config.TemplateArhatExt.Log[0].Level = cliLogConfig.Level
+			config.TemplateGo.Log[0].Level = cliLogConfig.Level
 		}
 
 		if flags.Changed("log.file") {
-			config.TemplateArhatExt.Log[0].File = cliLogConfig.File
+			config.TemplateGo.Log[0].File = cliLogConfig.File
 		}
 	} else {
-		config.TemplateArhatExt.Log = append(config.TemplateArhatExt.Log, *cliLogConfig)
+		config.TemplateGo.Log = append(config.TemplateGo.Log, *cliLogConfig)
 	}
 
 	if err = cmd.ParseFlags(os.Args); err != nil {
 		return nil, err
 	}
 
-	err = log.SetDefaultLogger(config.TemplateArhatExt.Log)
+	err = log.SetDefaultLogger(config.TemplateGo.Log)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set default logger: %w", err)
 	}

@@ -1,4 +1,4 @@
-module arhat.dev/template-arhat-ext-go
+module ext.arhat.dev/template-go
 
 go 1.15
 

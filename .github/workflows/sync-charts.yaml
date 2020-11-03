@@ -14,11 +14,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        path: template-arhat-ext-go
+        path: template-go
 
     - uses: actions/checkout@v2
       with:
-        repository: arhat-dev/helm-charts
+        repository: arhat-ext/helm-charts
         path: helm-charts
         ssh-key: ${{ secrets.ORG_SSH_KEY }}
 
@@ -29,11 +29,11 @@ jobs:
 
     - name: Update charts
       run: |
-        for chart in template-arhat-ext-go/cicd/deploy/charts/*; do
-          chart="${chart#template-arhat-ext-go/cicd/deploy/charts/}"
+        for chart in template-go/cicd/deploy/charts/*; do
+          chart="${chart#template-go/cicd/deploy/charts/}"
           echo "Updating chart ${chart}..."
           rm -rf "helm-charts/charts/${chart}"
-          mv "template-arhat-ext-go/cicd/deploy/charts/${chart}" "helm-charts/charts/${chart}"
+          mv "template-go/cicd/deploy/charts/${chart}" "helm-charts/charts/${chart}"
           echo "Chart ${chart} updated"
         done
 
@@ -41,5 +41,5 @@ jobs:
       run: |
         cd helm-charts
         git add --all .
-        git commit -m "Update charts from template-arhat-ext-go"
+        git commit -m "Update charts from template-go"
         git push

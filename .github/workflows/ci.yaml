@@ -105,15 +105,15 @@ jobs:
         DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         GITHUB_DOCKER_USERNAME: ${{ github.actor }}
         GITHUB_DOCKER_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}
-        IMAGE_REPOS: docker.io/arhatdev,ghcr.io/arhat-dev
+        IMAGE_REPOS: docker.io/arhatext,ghcr.io/arhat-ext
       run: |
         docker login docker.io -u="${DOCKERHUB_USERNAME}" -p="${DOCKERHUB_PASSWORD}"
-        docker login ghcr.io/arhat-dev -u="${GITHUB_DOCKER_USERNAME}" -p="${GITHUB_DOCKER_PASSWORD}"
+        docker login ghcr.io/arhat-ext -u="${GITHUB_DOCKER_USERNAME}" -p="${GITHUB_DOCKER_PASSWORD}"
 
         make image.build.linux.all
         make image.push.linux.all
 
-  # TODO: Add support for windows image build in arhat-dev/dockerfile
+  # TODO: Add support for windows image build in arhat-ext/dockerfile
   # build-windows-images:
   #   if: contains(github.head_ref, 'deps/') == false
   #   needs:
@@ -129,10 +129,10 @@ jobs:
   #       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
   #       GITHUB_DOCKER_USERNAME: ${{ github.actor }}
   #       GITHUB_DOCKER_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}
-  #       IMAGE_REPOS: docker.io/arhatdev,ghcr.io/arhat-dev
+  #       IMAGE_REPOS: docker.io/arhatext,ghcr.io/arhat-ext
   #     run: |
   #       docker login docker.io -u="${DOCKERHUB_USERNAME}" -p="${DOCKERHUB_PASSWORD}"
-  #       docker login ghcr.io/arhat-dev -u="${GITHUB_DOCKER_USERNAME}" -p="${GITHUB_DOCKER_PASSWORD}"
+  #       docker login ghcr.io/arhat-ext -u="${GITHUB_DOCKER_USERNAME}" -p="${GITHUB_DOCKER_PASSWORD}"
 
   #       make image.build.windows.all
   #       make image.push.windows.all

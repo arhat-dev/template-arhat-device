@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # IMAGE_REPOS is the comma separated list of image registries
-IMAGE_REPOS ?= docker.io/arhatdev,ghcr.io/arhat-dev
+IMAGE_REPOS ?= docker.io/arhatext,ghcr.io/arhat-ext
 
 export IMAGE_REPOS
 
@@ -31,28 +31,28 @@ vendor:
 include scripts/test/unit.mk
 
 # binary build
-include scripts/build/template-arhat-ext-go.mk
+include scripts/build/template-go.mk
 
 # image
-include scripts/image/template-arhat-ext-go.mk
+include scripts/image/template-go.mk
 
 image.build.linux.all: \
-	image.build.template-arhat-ext-go.linux.all
+	image.build.template-go.linux.all
 
 image.build.windows.all: \
-	image.build.template-arhat-ext-go.windows.all
+	image.build.template-go.windows.all
 
 image.push.linux.all: \
-	image.push.template-arhat-ext-go.linux.all
+	image.push.template-go.linux.all
 
 image.push.windows.all: \
-	image.push.template-arhat-ext-go.windows.all
+	image.push.template-go.windows.all
 
 # manifest
 include scripts/gen/manifests.mk
 
 # packaging
-include scripts/package/template-arhat-ext-go.mk
+include scripts/package/template-go.mk
 
 # optional private scripts
 -include private/scripts.mk

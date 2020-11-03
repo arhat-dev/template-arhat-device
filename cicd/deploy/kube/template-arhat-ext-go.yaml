@@ -1,19 +1,19 @@
 ---
-# Source: template-arhat-ext-go/templates/configmap.yaml
+# Source: template-go/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: template-arhat-ext-go
+  name: template-go
   namespace: default
   labels:
-    helm.sh/chart: template-arhat-ext-go-0.1.0
-    app.kubernetes.io/name: template-arhat-ext-go
-    app.kubernetes.io/instance: template-arhat-ext-go
+    helm.sh/chart: template-go-0.1.0
+    app.kubernetes.io/name: template-go
+    app.kubernetes.io/instance: template-go
     app.kubernetes.io/version: "latest"
     app.kubernetes.io/managed-by: Helm
 data:
   config.yaml: |
-    templateArhatExt:
+    templateGo:
       endpoint: unix:///var/run/arhat.sock
       log:
       - file: stderr
@@ -26,28 +26,28 @@ data:
         insecureSkipVerify: true
         key: /path/to/client-cert-key
 ---
-# Source: template-arhat-ext-go/templates/daemonset.yaml
+# Source: template-go/templates/daemonset.yaml
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: template-arhat-ext-go
+  name: template-go
   namespace: default
   labels:
-    helm.sh/chart: template-arhat-ext-go-0.1.0
-    app.kubernetes.io/name: template-arhat-ext-go
-    app.kubernetes.io/instance: template-arhat-ext-go
+    helm.sh/chart: template-go-0.1.0
+    app.kubernetes.io/name: template-go
+    app.kubernetes.io/instance: template-go
     app.kubernetes.io/version: "latest"
     app.kubernetes.io/managed-by: Helm
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: template-arhat-ext-go
-      app.kubernetes.io/instance: template-arhat-ext-go
+      app.kubernetes.io/name: template-go
+      app.kubernetes.io/instance: template-go
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: template-arhat-ext-go
-        app.kubernetes.io/instance: template-arhat-ext-go
+        app.kubernetes.io/name: template-go
+        app.kubernetes.io/instance: template-go
     spec:
       securityContext:
         {}
@@ -60,12 +60,12 @@ spec:
         - name: arhat-peripheral
           securityContext:
             {}
-          image: "docker.io/arhatdev/template-arhat-ext-go:latest"
+          image: "docker.io/arhatext/template-go:latest"
           imagePullPolicy: IfNotPresent
           command:
-            - /template-arhat-ext-go
+            - /template-go
             - -c
-            - /etc/template-arhat-ext-go/config.yaml
+            - /etc/template-go/config.yaml
           ports:
             - name: http
               containerPort: 80
@@ -80,7 +80,7 @@ spec:
               port: http
           volumeMounts:
             - name: config
-              mountPath: /etc/template-arhat-ext-go
+              mountPath: /etc/template-go
           resources:
             {}
       nodeSelector:
@@ -88,4 +88,4 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: template-arhat-ext-go
+            name: template-go

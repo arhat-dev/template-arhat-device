@@ -7,12 +7,12 @@
   dependencies:
   - stylecheck
 
-test:unit:linux:template-arhat-ext-go:
+test:unit:linux:template-go:
   extends: .test:unit
   tags:
   - linux
 
-# test:unit:windows:template-arhat-ext-go:
+# test:unit:windows:template-go:
 #   extends: .test:unit
 #   tags:
 #   - windows

@@ -1,10 +1,10 @@
-# template-arhat-ext-go
+# template-go
 
-`template-arhat-ext-go` is a template repo for extension development using `arhat-proto`
+`template-go` is a template repo for extension development using `arhat-proto`
 
 ## Introduction
 
-This is the sample helm chart for [template-arhat-ext-go](https://github.com/arhat-dev/template-arhat-ext-go)
+This is the sample helm chart for [template-go](https://github.com/arhat-ext/template-go)
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ This is the sample helm chart for [template-arhat-ext-go](https://github.com/arh
 ## Installing the Chart
 
 ```bash
-helm install my-release arhat-dev/template-arhat-ext-go
+helm install my-release arhat-ext/template-go
 ```
 
 ## Uninstalling the Chart
@@ -25,4 +25,4 @@ helm delete my-release
 
 ## Configuration
 
-Please refer to the [`values.yaml`](https://github.com/arhat-dev/template-arhat-ext-go/blob/master/cicd/deploy/charts/template-arhat-ext-go/values.yaml)
+Please refer to the [`values.yaml`](https://github.com/arhat-ext/template-go/blob/master/cicd/deploy/charts/template-go/values.yaml)

@@ -1,4 +1,4 @@
-build:image:linux:template-arhat-ext-go:
+build:image:linux:template-go:
   stage: build-images
   image: docker:stable
   services:
@@ -14,14 +14,14 @@ build:image:linux:template-arhat-ext-go:
   tags:
   - linux
   dependencies:
-  - test:unit:linux:template-arhat-ext-go
+  - test:unit:linux:template-go
 
 # TODO: build windows containers
-# build:image:windows:template-arhat-ext-go:
+# build:image:windows:template-go:
 #   script:
 #   - make image.build.windows.all
 #   - make image.push.windows.all
 #   tags:
 #   - windows
 #   dependencies:
-#   - test:unit:windows:template-arhat-ext-go
+#   - test:unit:windows:template-go

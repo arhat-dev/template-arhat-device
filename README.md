@@ -1,19 +1,19 @@
-# Template Arhat Extension Go
+# Template Go
 
-[![CI](https://github.com/arhat-dev/template-arhat-ext-go/workflows/CI/badge.svg)](https://github.com/arhat-dev/template-arhat-ext-go/actions?query=workflow%3ACI)
-[![Build](https://github.com/arhat-dev/template-arhat-ext-go/workflows/Build/badge.svg)](https://github.com/arhat-dev/template-arhat-ext-go/actions?query=workflow%3ABuild)
-[![PkgGoDev](https://pkg.go.dev/badge/arhat.dev/template-arhat-ext-go)](https://pkg.go.dev/arhat.dev/template-arhat-ext-go)
-[![GoReportCard](https://goreportcard.com/badge/arhat.dev/template-arhat-ext-go)](https://goreportcard.com/report/arhat.dev/template-arhat-ext-go)
-[![codecov](https://codecov.io/gh/arhat-dev/template-arhat-ext-go/branch/master/graph/badge.svg)](https://codecov.io/gh/arhat-dev/template-arhat-ext-go)
+[![CI](https://github.com/arhat-ext/template-go/workflows/CI/badge.svg)](https://github.com/arhat-ext/template-go/actions?query=workflow%3ACI)
+[![Build](https://github.com/arhat-ext/template-go/workflows/Build/badge.svg)](https://github.com/arhat-ext/template-go/actions?query=workflow%3ABuild)
+[![PkgGoDev](https://pkg.go.dev/badge/ext.arhat.dev/template-go)](https://pkg.go.dev/ext.arhat.dev/template-go)
+[![GoReportCard](https://goreportcard.com/badge/ext.arhat.dev/template-go)](https://goreportcard.com/report/ext.arhat.dev/template-go)
+[![codecov](https://codecov.io/gh/arhat-ext/template-go/branch/master/graph/badge.svg)](https://codecov.io/gh/arhat-ext/template-go)
 
-Template repo for extensions integrating with [`arhat`](https://github.com/arhat-dev/arhat) via [`arhat-proto`](https://github.com/arhat-dev/arhat-proto) in Go
+Template repo for extensions integrating with [`arhat`](https://github.com/arhat-dev/arhat) via [`arhat-proto`](https://github.com/arhat-dev/arhat-proto) using [`arhat.dev/libext`](https://github.com/arhat-dev/libext-go) in Go
 
 ## Usage
 
 1. Create a new repo using this template
-2. Rename `template-arhat-ext-go` (most importantly, the module name in `go.mod` file) according to your preference
+2. Rename `template-go` (most importantly, the module name in `go.mod` file) according to your preference
 3. Update application configuration definition in [`pkg/conf`](./pkg/conf/)
-4. Update extension name `my-extension-name` in [`pkg/cmd`](./pkg/cmd/template-arhat-ext-go.go)
+4. Update extension name `my-extension-name` in [`pkg/cmd`](./pkg/cmd/template-go.go)
 5. Implement your extension by updating code in `pkg/<some name>`
    - e.g. peripheral extension: in [`pkg/peripheral`](./pkg/peripheral/)
 6. Update deployment charts in [`cicd/deploy/charts/`](./cicd/deploy/charts/)

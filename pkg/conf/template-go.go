@@ -21,12 +21,12 @@ import (
 	"arhat.dev/pkg/log"
 	"github.com/spf13/pflag"
 
-	"arhat.dev/template-arhat-ext-go/pkg/constant"
+	"ext.arhat.dev/template-go/pkg/constant"
 )
 
 // nolint:lll
 type Config struct {
-	TemplateArhatExt AppConfig `json:"templateArhatExt" yaml:"templateArhatExt"`
+	TemplateGo AppConfig `json:"templateGo" yaml:"templateGo"`
 }
 
 type AppConfig struct {
@@ -39,7 +39,7 @@ type AppConfig struct {
 	TLS confhelper.TLSConfig `json:"tls" yaml:"tls"`
 }
 
-func FlagsForTemplateArhatExt(prefix string, config *AppConfig) *pflag.FlagSet {
+func FlagsForTemplateGo(prefix string, config *AppConfig) *pflag.FlagSet {
 	fs := pflag.NewFlagSet("app", pflag.ExitOnError)
 
 	fs.StringVar(&config.Endpoint, prefix+"endpoint",
