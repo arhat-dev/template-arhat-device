@@ -60,24 +60,24 @@ spec:
         - name: arhat-peripheral
           securityContext:
             {}
-          image: "docker.io/arhatext/template-go:latest"
+          image: "ghcr.io/arhat-ext/template-go:latest"
           imagePullPolicy: IfNotPresent
           command:
             - /template-go
             - -c
             - /etc/template-go/config.yaml
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          # ports:
+          #   - name: http
+          #     containerPort: 80
+          #     protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
           volumeMounts:
             - name: config
               mountPath: /etc/template-go
