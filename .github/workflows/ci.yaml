@@ -103,7 +103,7 @@ jobs:
         DOCKER_CLI_EXPERIMENTAL: enabled
         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-        GITHUB_DOCKER_USERNAME: ${{ github.actor }}
+        GITHUB_DOCKER_USERNAME: ${{ secrets.GH_PACKAGES_USER }}
         GITHUB_DOCKER_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}
         IMAGE_REPOS: docker.io/arhatext,ghcr.io/arhat-ext
       run: |
@@ -127,7 +127,7 @@ jobs:
   #       DOCKER_CLI_EXPERIMENTAL: enabled
   #       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   #       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-  #       GITHUB_DOCKER_USERNAME: ${{ github.actor }}
+  #       GITHUB_DOCKER_USERNAME: ${{ secrets.GH_PACKAGES_USER }}
   #       GITHUB_DOCKER_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}
   #       IMAGE_REPOS: docker.io/arhatext,ghcr.io/arhat-ext
   #     run: |
