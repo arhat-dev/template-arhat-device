@@ -243,7 +243,7 @@ jobs:
 
     - name: Build changelog
       id: build_changelog
-      uses: mikepenz/release-changelog-builder-action@v1
+      uses: mikepenz/release-changelog-builder-action@v1.2.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
