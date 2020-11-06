@@ -14,14 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package types
+package iohelper
 
 import (
-	"arhat.dev/arhat-proto/arhatgopb"
+	"io/ioutil"
+	"os"
 )
 
-// Handler for controller
-type Handler interface {
-	// HandleCmd process one command per function call, payload is non stream data
-	HandleCmd(id uint64, kind arhatgopb.CmdType, payload []byte) (interface{}, error)
+func TempFilename(dir, pattern string) (string, error) {
+	f, err := ioutil.TempFile(dir, pattern)
+	if err != nil {
+		return "", err
+	}
+
+	name := f.Name()
+	_ = f.Close()
+	_ = os.Remove(name)
+
+	return name, nil
 }

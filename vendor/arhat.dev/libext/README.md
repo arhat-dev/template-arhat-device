@@ -9,7 +9,7 @@ Library for building [`arhat`](https://github.com/arhat-dev/arhat) extensions in
 
 ## Support Matrix
 
-- Protocols: `tcp`, `tcp-tls`, `udp`, `udp-dtls`, `unix`, `unix-tls`
+- Protocols: `tcp`, `tcp-tls`, `udp`, `udp-dtls`, `unix`, `unix-tls`, `pipe`, `pipe-tls`
 - Codec: `json`, `protobuf`
 
 please refer to [Benchmark](#benchmark) for performance evaluation of different combinations
@@ -18,7 +18,7 @@ please refer to [Benchmark](#benchmark) for performance evaluation of different 
 
 ### Controller for Extension (Client)
 
-__TL;DR__: create a project using this template: [`template-arhat-ext-go`](https://github.com/arhat-dev/template-arhat-ext-go) or have a look at [`examples/client_example_test.go`](./examples/client_example_test.go)
+__TL;DR__: create a project using this template: [`arhat-ext/template-go`](https://github.com/arhat-ext/template-go) or have a look at [`examples/client_example_test.go`](./examples/client_example_test.go)
 
 ### Extension Hub (Server)
 

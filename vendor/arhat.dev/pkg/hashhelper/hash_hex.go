@@ -14,14 +14,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package types
+package hashhelper
 
 import (
-	"arhat.dev/arhat-proto/arhatgopb"
+	"crypto/md5"
+	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/hex"
 )
 
-// Handler for controller
-type Handler interface {
-	// HandleCmd process one command per function call, payload is non stream data
-	HandleCmd(id uint64, kind arhatgopb.CmdType, payload []byte) (interface{}, error)
+func Sha256SumHex(data []byte) string {
+	h := sha256.New()
+	_, _ = h.Write(data)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func Sha512SumHex(data []byte) string {
+	h := sha512.New()
+	_, _ = h.Write(data)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func MD5SumHex(data []byte) string {
+	h := md5.New()
+	_, _ = h.Write(data)
+	return hex.EncodeToString(h.Sum(nil))
 }

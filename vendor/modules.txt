@@ -1,7 +1,7 @@
 # arhat.dev/arhat-proto v0.3.1
 ## explicit
 arhat.dev/arhat-proto/arhatgopb
-# arhat.dev/libext v0.3.0
+# arhat.dev/libext v0.3.1
 ## explicit
 arhat.dev/libext
 arhat.dev/libext/codec
@@ -10,13 +10,19 @@ arhat.dev/libext/codec/codecpb
 arhat.dev/libext/extperipheral
 arhat.dev/libext/types
 arhat.dev/libext/util
-# arhat.dev/pkg v0.1.1
+# arhat.dev/pkg v0.2.10
 ## explicit
 arhat.dev/pkg/confhelper
 arhat.dev/pkg/envhelper
+arhat.dev/pkg/hashhelper
+arhat.dev/pkg/iohelper
 arhat.dev/pkg/log
+arhat.dev/pkg/pipenet
 # github.com/DataDog/sketches-go v0.0.1
 github.com/DataDog/sketches-go/ddsketch
+# github.com/Microsoft/go-winio v0.4.15
+github.com/Microsoft/go-winio
+github.com/Microsoft/go-winio/pkg/guid
 # github.com/apache/thrift v0.13.0
 github.com/apache/thrift/lib/go/thrift
 # github.com/beorn7/perks v1.0.1

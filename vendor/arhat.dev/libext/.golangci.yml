@@ -71,3 +71,11 @@ issues:
   - text: "commentFormatting: put a space between `//` and comment text"
     linters:
     - gocritic
+
+  - text: string `windows`
+    linters:
+    - goconst
+
+  - text: string `pipe`
+    linters:
+    - goconst

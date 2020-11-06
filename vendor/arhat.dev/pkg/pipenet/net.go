@@ -14,14 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package types
+package pipenet
 
 import (
-	"arhat.dev/arhat-proto/arhatgopb"
+	"net"
 )
 
-// Handler for controller
-type Handler interface {
-	// HandleCmd process one command per function call, payload is non stream data
-	HandleCmd(id uint64, kind arhatgopb.CmdType, payload []byte) (interface{}, error)
+var _ net.Addr = (*PipeAddr)(nil)
+
+type PipeAddr struct {
+	Path string
+}
+
+func (a *PipeAddr) Network() string {
+	return "pipe"
+}
+
+func (a *PipeAddr) String() string {
+	return a.Path
 }

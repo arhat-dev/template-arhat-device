@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The arhat.dev Authors.
+Copyright 2019 The arhat.dev Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,14 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package types
+package iohelper
 
 import (
-	"arhat.dev/arhat-proto/arhatgopb"
+	"io"
+	"os"
 )
 
-// Handler for controller
-type Handler interface {
-	// HandleCmd process one command per function call, payload is non stream data
-	HandleCmd(id uint64, kind arhatgopb.CmdType, payload []byte) (interface{}, error)
+// Pipe returns io.Pipe if os.Pipe errored
+func Pipe() (io.ReadCloser, io.WriteCloser) {
+	var (
+		r io.ReadCloser
+		w io.WriteCloser
+	)
+
+	r, w, err := os.Pipe()
+	if err != nil {
+		r, w = io.Pipe()
+	}
+
+	return r, w
 }
