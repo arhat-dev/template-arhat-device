@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	arhat.dev/arhat-proto v0.3.1
-	arhat.dev/pkg v0.2.10
+	arhat.dev/pkg v0.2.11
 	github.com/gogo/protobuf v1.3.1
 	github.com/pion/dtls/v2 v2.0.3
 	github.com/stretchr/testify v1.6.1

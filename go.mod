@@ -33,8 +33,8 @@ replace (
 
 require (
 	arhat.dev/arhat-proto v0.3.1
-	arhat.dev/libext v0.3.1
-	arhat.dev/pkg v0.2.10
+	arhat.dev/libext v0.3.2
+	arhat.dev/pkg v0.2.11
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	gopkg.in/yaml.v2 v2.3.0
