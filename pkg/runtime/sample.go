@@ -80,26 +80,38 @@ func (r *SampleRuntime) PortForward(
 	return wellknownerrors.ErrNotSupported
 }
 
-func (r *SampleRuntime) EnsurePod(ctx context.Context, options *runtimepb.PodEnsureCmd) (*runtimepb.PodStatusMsg, error) {
+func (r *SampleRuntime) EnsurePod(
+	ctx context.Context, options *runtimepb.PodEnsureCmd,
+) (*runtimepb.PodStatusMsg, error) {
 	return nil, wellknownerrors.ErrNotSupported
 }
 
-func (r *SampleRuntime) DeletePod(ctx context.Context, options *runtimepb.PodDeleteCmd) (*runtimepb.PodStatusMsg, error) {
+func (r *SampleRuntime) DeletePod(
+	ctx context.Context, options *runtimepb.PodDeleteCmd,
+) (*runtimepb.PodStatusMsg, error) {
 	return nil, wellknownerrors.ErrNotSupported
 }
 
-func (r *SampleRuntime) ListPods(ctx context.Context, options *runtimepb.PodListCmd) (*runtimepb.PodStatusListMsg, error) {
+func (r *SampleRuntime) ListPods(
+	ctx context.Context, options *runtimepb.PodListCmd,
+) (*runtimepb.PodStatusListMsg, error) {
 	return nil, wellknownerrors.ErrNotSupported
 }
 
-func (r *SampleRuntime) EnsureImages(ctx context.Context, options *runtimepb.ImageEnsureCmd) (*runtimepb.ImageStatusListMsg, error) {
+func (r *SampleRuntime) EnsureImages(
+	ctx context.Context, options *runtimepb.ImageEnsureCmd,
+) (*runtimepb.ImageStatusListMsg, error) {
 	return nil, wellknownerrors.ErrNotSupported
 }
 
-func (r *SampleRuntime) DeleteImages(ctx context.Context, options *runtimepb.ImageDeleteCmd) (*runtimepb.ImageStatusListMsg, error) {
+func (r *SampleRuntime) DeleteImages(
+	ctx context.Context, options *runtimepb.ImageDeleteCmd,
+) (*runtimepb.ImageStatusListMsg, error) {
 	return nil, wellknownerrors.ErrNotSupported
 }
 
-func (r *SampleRuntime) ListImages(ctx context.Context, options *runtimepb.ImageListCmd) (*runtimepb.ImageStatusListMsg, error) {
+func (r *SampleRuntime) ListImages(
+	ctx context.Context, options *runtimepb.ImageListCmd,
+) (*runtimepb.ImageStatusListMsg, error) {
 	return nil, wellknownerrors.ErrNotSupported
 }
