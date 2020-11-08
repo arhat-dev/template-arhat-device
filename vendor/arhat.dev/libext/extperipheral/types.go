@@ -17,15 +17,31 @@ limitations under the License.
 package extperipheral
 
 import (
+	"context"
+
 	"arhat.dev/arhat-proto/arhatgopb"
 )
 
 type Peripheral interface {
-	Operate(params map[string]string, data []byte) ([][]byte, error)
-	CollectMetrics(params map[string]string) ([]*arhatgopb.PeripheralMetricsMsg_Value, error)
-	Close()
+	Operate(
+		ctx context.Context,
+		params map[string]string,
+		data []byte,
+	) ([][]byte, error)
+
+	CollectMetrics(
+		ctx context.Context,
+		params map[string]string,
+	) ([]*arhatgopb.PeripheralMetricsMsg_Value, error)
+
+	Close(ctx context.Context)
 }
 
 type PeripheralConnector interface {
-	Connect(target string, params map[string]string, tlsConfig *arhatgopb.TLSConfig) (Peripheral, error)
+	Connect(
+		ctx context.Context,
+		target string,
+		params map[string]string,
+		tlsConfig *arhatgopb.TLSConfig,
+	) (Peripheral, error)
 }

@@ -17,79 +17,97 @@ limitations under the License.
 package extperipheral
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
 	"arhat.dev/arhat-proto/arhatgopb"
 	"arhat.dev/pkg/log"
+	"arhat.dev/pkg/wellknownerrors"
 
 	"arhat.dev/libext/types"
+	"arhat.dev/libext/util"
 )
 
-type cmdHandleFunc func(p Peripheral, payload []byte) (interface{}, error)
+type cmdHandleFunc func(ctx context.Context, p Peripheral, payload []byte) (interface{}, error)
 
-func NewHandler(logger log.Interface, unmarshal types.UnmarshalFunc, impl PeripheralConnector) *Handler {
-	return &Handler{
+func NewHandler(logger log.Interface, unmarshal types.UnmarshalFunc, impl PeripheralConnector) types.Handler {
+	mu := new(sync.RWMutex)
+	h := &Handler{
+		BaseHandler: util.NewBaseHandler(mu),
+
 		logger: logger,
 
 		unmarshal:   unmarshal,
 		impl:        impl,
 		peripherals: new(sync.Map),
+
+		funcMap: nil,
 	}
+
+	h.funcMap = map[arhatgopb.CmdType]cmdHandleFunc{
+		arhatgopb.CMD_PERIPHERAL_OPERATE:         h.handlePeripheralOperate,
+		arhatgopb.CMD_PERIPHERAL_COLLECT_METRICS: h.handlePeripheralMetricsCollect,
+	}
+
+	return h
 }
 
 type Handler struct {
+	*util.BaseHandler
+
 	logger log.Interface
 
 	unmarshal   types.UnmarshalFunc
 	impl        PeripheralConnector
 	peripherals *sync.Map
+
+	funcMap map[arhatgopb.CmdType]cmdHandleFunc
 }
 
 func (c *Handler) HandleCmd(
-	id uint64, kind arhatgopb.CmdType, payload []byte,
+	ctx context.Context,
+	id, seq uint64,
+	kind arhatgopb.CmdType,
+	payload []byte,
 ) (interface{}, error) {
-	handlerMap := map[arhatgopb.CmdType]cmdHandleFunc{
-		arhatgopb.CMD_PERIPHERAL_OPERATE:         c.handlePeripheralOperate,
-		arhatgopb.CMD_PERIPHERAL_COLLECT_METRICS: c.handlePeripheralMetricsCollect,
-	}
-
 	switch kind {
 	case arhatgopb.CMD_PERIPHERAL_CLOSE:
 		c.logger.D("removing peripheral")
-		c.removePeripheral(id)
+		c.removePeripheral(ctx, id)
 		return &arhatgopb.DoneMsg{}, nil
 	case arhatgopb.CMD_PERIPHERAL_CONNECT:
 		c.logger.D("connecting peripheral")
-		err := c.handlePeripheralConnect(id, payload)
+		err := c.handlePeripheralConnect(ctx, id, payload)
 		if err != nil {
 			return nil, err
 		}
 		return &arhatgopb.DoneMsg{}, nil
 	default:
-		c.logger.D("working on peripheral specific operation")
-		// requires peripheral
-		handle, ok := handlerMap[kind]
-		if !ok {
-			c.logger.I("unknown peripheral cmd type", log.Int32("kind", int32(kind)))
-			return nil, fmt.Errorf("unknown cmd")
-		}
-
-		p, ok := c.getPeripheral(id)
-		if !ok {
-			return nil, fmt.Errorf("peripheral not found")
-		}
-
-		ret, err := handle(p, payload)
-		if err != nil {
-			return nil, err
-		}
-
-		return ret, nil
 	}
+
+	c.logger.D("working on peripheral specific operation")
+	// requires peripheral
+	handle, ok := c.funcMap[kind]
+	if !ok {
+		c.logger.I("unknown peripheral cmd type", log.Int32("kind", int32(kind)))
+		return nil, fmt.Errorf("unknown cmd")
+	}
+
+	p, ok := c.getPeripheral(id)
+	if !ok {
+		return nil, wellknownerrors.ErrNotFound
+	}
+
+	ret, err := handle(ctx, p, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
 }
 
-func (c *Handler) handlePeripheralConnect(peripheralID uint64, payload []byte) (err error) {
+func (c *Handler) handlePeripheralConnect(ctx context.Context, peripheralID uint64, payload []byte) (err error) {
 	if _, loaded := c.peripherals.Load(peripheralID); loaded {
 		return fmt.Errorf("invalid duplicate peripheral id")
 	}
@@ -100,14 +118,14 @@ func (c *Handler) handlePeripheralConnect(peripheralID uint64, payload []byte) (
 		return fmt.Errorf("failed to unmarshal PeripheralConnectCmd: %w", err)
 	}
 
-	p, err := c.impl.Connect(spec.Target, spec.Params, spec.Tls)
+	p, err := c.impl.Connect(ctx, spec.Target, spec.Params, spec.Tls)
 	if err != nil {
 		return fmt.Errorf("failed to establish connection to peripheral: %w", err)
 	}
 
 	defer func() {
 		if err != nil {
-			p.Close()
+			p.Close(ctx)
 		}
 	}()
 
@@ -133,23 +151,25 @@ func (c *Handler) getPeripheral(peripheralID uint64) (Peripheral, bool) {
 	return p, true
 }
 
-func (c *Handler) removePeripheral(peripheralID uint64) {
+func (c *Handler) removePeripheral(ctx context.Context, peripheralID uint64) {
 	p, ok := c.getPeripheral(peripheralID)
 	if ok {
-		p.Close()
+		p.Close(ctx)
 	}
 
 	c.peripherals.Delete(peripheralID)
 }
 
-func (c *Handler) handlePeripheralOperate(p Peripheral, payload []byte) (interface{}, error) {
+func (c *Handler) handlePeripheralOperate(
+	ctx context.Context, p Peripheral, payload []byte,
+) (interface{}, error) {
 	spec := new(arhatgopb.PeripheralOperateCmd)
 	err := c.unmarshal(payload, spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal PeripheralOperateCmd: %w", err)
 	}
 
-	ret, err := p.Operate(spec.Params, spec.Data)
+	ret, err := p.Operate(ctx, spec.Params, spec.Data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute operation: %w", err)
 	}
@@ -157,14 +177,16 @@ func (c *Handler) handlePeripheralOperate(p Peripheral, payload []byte) (interfa
 	return &arhatgopb.PeripheralOperationResultMsg{Result: ret}, nil
 }
 
-func (c *Handler) handlePeripheralMetricsCollect(p Peripheral, payload []byte) (interface{}, error) {
+func (c *Handler) handlePeripheralMetricsCollect(
+	ctx context.Context, p Peripheral, payload []byte,
+) (interface{}, error) {
 	spec := new(arhatgopb.PeripheralMetricsCollectCmd)
 	err := c.unmarshal(payload, spec)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal PeripheralMetricsCollectCmd: %w", err)
 	}
 
-	ret, err := p.CollectMetrics(spec.Params)
+	ret, err := p.CollectMetrics(ctx, spec.Params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to collect peripheral metrics: %w", err)
 	}

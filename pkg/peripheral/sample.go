@@ -17,6 +17,7 @@ limitations under the License.
 package peripheral
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"strconv"
@@ -27,12 +28,15 @@ import (
 	"arhat.dev/libext/extperipheral"
 )
 
-var _ extperipheral.PeripheralConnector = &SamplePeripheralConnector{}
+var _ extperipheral.PeripheralConnector = (*SamplePeripheralConnector)(nil)
 
 type SamplePeripheralConnector struct{}
 
 func (c *SamplePeripheralConnector) Connect(
-	target string, params map[string]string, tlsConfig *arhatgopb.TLSConfig,
+	ctx context.Context,
+	target string,
+	params map[string]string,
+	tlsConfig *arhatgopb.TLSConfig,
 ) (extperipheral.Peripheral, error) {
 	config, err := resolvePeripheralConfig(params, tlsConfig)
 	if err != nil {
@@ -52,7 +56,11 @@ type SamplePeripheral struct {
 	config *SampleConfig
 }
 
-func (d *SamplePeripheral) Operate(params map[string]string, data []byte) ([][]byte, error) {
+func (d *SamplePeripheral) Operate(
+	ctx context.Context,
+	params map[string]string,
+	data []byte,
+) ([][]byte, error) {
 	var ret [][]byte
 	for k, v := range params {
 		ret = append(ret, []byte(k))
@@ -62,7 +70,10 @@ func (d *SamplePeripheral) Operate(params map[string]string, data []byte) ([][]b
 	return ret, nil
 }
 
-func (d *SamplePeripheral) CollectMetrics(param map[string]string) ([]*arhatgopb.PeripheralMetricsMsg_Value, error) {
+func (d *SamplePeripheral) CollectMetrics(
+	ctx context.Context,
+	param map[string]string,
+) ([]*arhatgopb.PeripheralMetricsMsg_Value, error) {
 	_ = param
 
 	return []*arhatgopb.PeripheralMetricsMsg_Value{
@@ -71,7 +82,7 @@ func (d *SamplePeripheral) CollectMetrics(param map[string]string) ([]*arhatgopb
 	}, nil
 }
 
-func (d *SamplePeripheral) Close() {}
+func (d *SamplePeripheral) Close(ctx context.Context) {}
 
 type SampleConfig struct {
 	Foo string

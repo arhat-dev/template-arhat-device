@@ -17,8 +17,8 @@ limitations under the License.
 package conf
 
 import (
-	"arhat.dev/pkg/confhelper"
 	"arhat.dev/pkg/log"
+	"arhat.dev/pkg/tlshelper"
 	"github.com/spf13/pflag"
 
 	"ext.arhat.dev/template-go/pkg/constant"
@@ -36,7 +36,7 @@ type AppConfig struct {
 	Endpoint string `json:"endpoint" yaml:"endpoint"`
 
 	// TLS Client config for the endpoint
-	TLS confhelper.TLSConfig `json:"tls" yaml:"tls"`
+	TLS tlshelper.TLSConfig `json:"tls" yaml:"tls"`
 }
 
 func FlagsForTemplateGo(prefix string, config *AppConfig) *pflag.FlagSet {

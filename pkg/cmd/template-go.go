@@ -24,12 +24,14 @@ import (
 	"arhat.dev/libext"
 	"arhat.dev/libext/codec"
 	"arhat.dev/libext/extperipheral"
+	"arhat.dev/libext/extruntime"
 	"arhat.dev/pkg/log"
 	"github.com/spf13/cobra"
 
 	"ext.arhat.dev/template-go/pkg/conf"
 	"ext.arhat.dev/template-go/pkg/constant"
 	"ext.arhat.dev/template-go/pkg/peripheral"
+	"ext.arhat.dev/template-go/pkg/runtime"
 
 	// Add protobuf codec support
 	_ "arhat.dev/libext/codec/codecpb"
@@ -84,46 +86,100 @@ func run(appCtx context.Context, config *conf.Config) error {
 		return fmt.Errorf("failed to create tls config: %w", err)
 	}
 
-	c := codec.GetCodec(arhatgopb.CODEC_PROTOBUF)
-	client, err := libext.NewClient(
-		appCtx,
-		arhatgopb.EXTENSION_PERIPHERAL,
-		"my-extension-name",
-		c,
-		nil,
-		endpoint,
-		tlsConfig,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create extension client: %w", err)
-	}
+	go func() {
+		// sample peripheral controller
 
-	ctrl, err := libext.NewController(appCtx, log.Log.WithName("controller"), c.Marshal,
-		extperipheral.NewHandler(
-			log.Log.WithName("handler"),
-			c.Unmarshal,
-			&peripheral.SamplePeripheralConnector{},
-		),
-	)
-	if err != nil {
-		return fmt.Errorf("failed to create extension controller: %w", err)
-	}
+		c := codec.GetCodec(arhatgopb.CODEC_PROTOBUF)
+		client, err := libext.NewClient(
+			appCtx,
+			arhatgopb.EXTENSION_PERIPHERAL,
+			"my-extension-name",
+			c,
+			nil,
+			endpoint,
+			tlsConfig,
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to create extension client: %w", err))
+		}
 
-	err = ctrl.Start()
-	if err != nil {
-		return fmt.Errorf("failed to start controller: %w", err)
-	}
+		ctrl, err := libext.NewController(appCtx, log.Log.WithName("controller"), c.Marshal,
+			extperipheral.NewHandler(
+				log.Log.WithName("handler"),
+				c.Unmarshal,
+				&peripheral.SamplePeripheralConnector{},
+			),
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to create extension controller: %w", err))
+		}
 
-	logger.I("running")
-	for {
-		select {
-		case <-appCtx.Done():
-			return nil
-		default:
-			err = client.ProcessNewStream(ctrl.RefreshChannels())
-			if err != nil {
-				logger.I("error happened when processing data stream", log.Error(err))
+		err = ctrl.Start()
+		if err != nil {
+			panic(fmt.Errorf("failed to start controller: %w", err))
+		}
+
+		logger.I("running")
+		for {
+			select {
+			case <-appCtx.Done():
+				return
+			default:
+				err = client.ProcessNewStream(ctrl.RefreshChannels())
+				if err != nil {
+					logger.I("error happened when processing data stream", log.Error(err))
+				}
 			}
 		}
-	}
+	}()
+
+	go func() {
+		// sample runtime engine
+
+		c := codec.GetCodec(arhatgopb.CODEC_PROTOBUF)
+		client, err := libext.NewClient(
+			appCtx,
+			arhatgopb.EXTENSION_RUNTIME,
+			"my-runtime-name",
+			c,
+			nil,
+			endpoint,
+			tlsConfig,
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to create extension client: %w", err))
+		}
+
+		ctrl, err := libext.NewController(appCtx, log.Log.WithName("runtime"), c.Marshal,
+			extruntime.NewHandler(
+				log.Log.WithName("handler"),
+				&runtime.SampleRuntime{},
+			),
+		)
+		if err != nil {
+			panic(fmt.Errorf("failed to create extension controller: %w", err))
+		}
+
+		err = ctrl.Start()
+		if err != nil {
+			panic(fmt.Errorf("failed to start controller: %w", err))
+		}
+
+		logger.I("running")
+		for {
+			select {
+			case <-appCtx.Done():
+				return
+			default:
+				err = client.ProcessNewStream(ctrl.RefreshChannels())
+				if err != nil {
+					logger.I("error happened when processing data stream", log.Error(err))
+				}
+			}
+		}
+	}()
+
+	<-appCtx.Done()
+
+	return nil
 }

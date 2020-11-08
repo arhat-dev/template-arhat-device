@@ -74,6 +74,7 @@ func (c *Controller) handleSession() {
 			cb   *channelBundle
 			more bool
 		)
+
 		select {
 		case <-c.ctx.Done():
 			return
@@ -99,11 +100,21 @@ func (c *Controller) handleSession() {
 
 		c.logger.D("receiving commands")
 		err := func() error {
+			ctx, cancel := context.WithCancel(c.ctx)
+			defer cancel()
+
+			c.handler.SetMsgSendFunc(sendMsg)
+
 			// cmdCh will be closed once RefreshChannels called
 			for cmd := range cb.cmdCh {
-				ret, err := c.handler.HandleCmd(cmd.Id, cmd.Kind, cmd.Payload)
+				ret, err := c.handler.HandleCmd(ctx, cmd.Id, cmd.Seq, cmd.Kind, cmd.Payload)
 				if err != nil {
 					ret = &arhatgopb.ErrorMsg{Description: err.Error()}
+				}
+
+				// no return message means async operation, will send message later
+				if ret == nil {
+					continue
 				}
 
 				kind := util.GetMsgType(ret)
