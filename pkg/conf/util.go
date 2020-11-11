@@ -63,27 +63,27 @@ func ReadConfig(
 		}
 	}
 
-	if len(config.TemplateGo.Log) > 0 {
+	if len(config.App.Log) > 0 {
 		if flags.Changed("log.format") {
-			config.TemplateGo.Log[0].Format = cliLogConfig.Format
+			config.App.Log[0].Format = cliLogConfig.Format
 		}
 
 		if flags.Changed("log.level") {
-			config.TemplateGo.Log[0].Level = cliLogConfig.Level
+			config.App.Log[0].Level = cliLogConfig.Level
 		}
 
 		if flags.Changed("log.file") {
-			config.TemplateGo.Log[0].File = cliLogConfig.File
+			config.App.Log[0].File = cliLogConfig.File
 		}
 	} else {
-		config.TemplateGo.Log = append(config.TemplateGo.Log, *cliLogConfig)
+		config.App.Log = append(config.App.Log, *cliLogConfig)
 	}
 
 	if err = cmd.ParseFlags(os.Args); err != nil {
 		return nil, err
 	}
 
-	err = log.SetDefaultLogger(config.TemplateGo.Log)
+	err = log.SetDefaultLogger(config.App.Log)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set default logger: %w", err)
 	}

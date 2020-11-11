@@ -32,17 +32,22 @@ import (
 
 type cmdHandleFunc func(ctx context.Context, sid uint64, payload []byte) (*runtimepb.Packet, error)
 
-func NewHandler(logger log.Interface, impl RuntimeEngine) types.Handler {
+func NewHandler(
+	logger log.Interface,
+	maxSingleMessagePayloadSize int,
+	impl RuntimeEngine,
+) types.Handler {
 	mu := new(sync.RWMutex)
 
 	h := &Handler{
 		BaseHandler: util.NewBaseHandler(mu),
 
+		maxPayloadSize: maxSingleMessagePayloadSize,
+
 		logger: logger,
 		impl:   impl,
 
 		funcMap: nil,
-
 		streams: util.NewStreamManager(),
 
 		mu: mu,
@@ -72,11 +77,12 @@ func NewHandler(logger log.Interface, impl RuntimeEngine) types.Handler {
 type Handler struct {
 	*util.BaseHandler
 
+	maxPayloadSize int
+
 	logger log.Interface
 	impl   RuntimeEngine
 
 	funcMap map[runtimepb.PacketType]cmdHandleFunc
-
 	streams *util.StreamManager
 
 	mu *sync.RWMutex

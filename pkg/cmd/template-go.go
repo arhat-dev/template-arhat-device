@@ -33,8 +33,9 @@ import (
 	"ext.arhat.dev/template-go/pkg/peripheral"
 	"ext.arhat.dev/template-go/pkg/runtime"
 
-	// Add protobuf codec support
-	_ "arhat.dev/libext/codec/codecpb"
+	_ "arhat.dev/libext/codec/codecpb"                // add protobuf codec support
+	_ "ext.arhat.dev/runtimeutil/storageutil/general" // add general storage support
+	_ "ext.arhat.dev/runtimeutil/storageutil/sshfs"   // add sshfs storage support
 )
 
 func NewTemplateGoCmd() *cobra.Command {
@@ -71,7 +72,7 @@ func NewTemplateGoCmd() *cobra.Command {
 
 	flags.StringVarP(&configFile, "config", "c", constant.DefaultTemplateGoConfigFile,
 		"path to the templateGo config file")
-	flags.AddFlagSet(conf.FlagsForTemplateGo("", &config.TemplateGo))
+	flags.AddFlagSet(conf.FlagsForApp("", &config.App))
 
 	return templateGoCmd
 }
@@ -79,9 +80,9 @@ func NewTemplateGoCmd() *cobra.Command {
 func run(appCtx context.Context, config *conf.Config) error {
 	logger := log.Log.WithName("TemplateGo")
 
-	endpoint := config.TemplateGo.Endpoint
+	endpoint := config.App.Endpoint
 
-	tlsConfig, err := config.TemplateGo.TLS.GetTLSConfig(false)
+	tlsConfig, err := config.App.TLS.GetTLSConfig(false)
 	if err != nil {
 		return fmt.Errorf("failed to create tls config: %w", err)
 	}
@@ -153,6 +154,7 @@ func run(appCtx context.Context, config *conf.Config) error {
 		ctrl, err := libext.NewController(appCtx, log.Log.WithName("runtime"), c.Marshal,
 			extruntime.NewHandler(
 				log.Log.WithName("handler"),
+				config.App.MaxDataMessagePayload,
 				&runtime.SampleRuntime{},
 			),
 		)

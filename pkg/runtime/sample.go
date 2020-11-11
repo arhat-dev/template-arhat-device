@@ -22,10 +22,9 @@ import (
 
 	"arhat.dev/aranya-proto/aranyagopb"
 	"arhat.dev/aranya-proto/aranyagopb/runtimepb"
-	"arhat.dev/pkg/wellknownerrors"
-
 	"arhat.dev/libext/extruntime"
 	"arhat.dev/libext/types"
+	"arhat.dev/pkg/wellknownerrors"
 )
 
 var _ extruntime.RuntimeEngine = (*SampleRuntime)(nil)
@@ -46,9 +45,12 @@ func (r *SampleRuntime) Exec(
 	stdout, stderr io.Writer,
 	command []string,
 	tty bool,
-	errCh chan<- *aranyagopb.ErrorMsg,
-) (doResize types.ResizeHandleFunc, err error) {
-	return nil, wellknownerrors.ErrNotSupported
+) (
+	doResize types.ResizeHandleFunc,
+	errCh <-chan *aranyagopb.ErrorMsg,
+	err error,
+) {
+	return nil, nil, wellknownerrors.ErrNotSupported
 }
 
 func (r *SampleRuntime) Attach(
@@ -56,9 +58,12 @@ func (r *SampleRuntime) Attach(
 	podUID, container string,
 	stdin io.Reader,
 	stdout, stderr io.Writer,
-	errCh chan<- *aranyagopb.ErrorMsg,
-) (doResize types.ResizeHandleFunc, err error) {
-	return nil, wellknownerrors.ErrNotSupported
+) (
+	doResize types.ResizeHandleFunc,
+	errCh <-chan *aranyagopb.ErrorMsg,
+	err error,
+) {
+	return nil, nil, wellknownerrors.ErrNotSupported
 }
 
 func (r *SampleRuntime) Logs(
@@ -75,9 +80,13 @@ func (r *SampleRuntime) PortForward(
 	protocol string,
 	port int32,
 	upstream io.Reader,
-	downstream io.Writer,
-) error {
-	return wellknownerrors.ErrNotSupported
+) (
+	downstream io.ReadCloser,
+	closeWrite func(),
+	readErrCh <-chan error,
+	err error,
+) {
+	return nil, nil, nil, wellknownerrors.ErrNotSupported
 }
 
 func (r *SampleRuntime) EnsurePod(

@@ -25,6 +25,7 @@ import (
 
 	"arhat.dev/aranya-proto/aranyagopb"
 	"arhat.dev/arhat-proto/arhatgopb"
+	"arhat.dev/pkg/exechelper"
 	"arhat.dev/pkg/iohelper"
 )
 
@@ -69,7 +70,9 @@ func (h *Handler) handleStreamOperation(
 		}
 	}
 
-	stdout, stderr, closeStream := h.createTerminalStream(ctx, sid, useStdout, useStderr, useStdin && useTty, &seq, wg)
+	stdout, stderr, closeStream := h.createTerminalStream(
+		ctx, sid, useStdout, useStderr, useStdin && useTty, &seq, wg,
+	)
 	defer closeStream()
 
 	err = run(stdout, stderr)
@@ -86,15 +89,10 @@ func (h *Handler) createTerminalStream(
 		readStdout  io.ReadCloser
 		readStderr  io.ReadCloser
 		readTimeout = 100 * time.Millisecond
-		seqMu       *sync.Mutex
 	)
 
 	if interactive {
 		readTimeout = 20 * time.Millisecond
-	}
-
-	if useStdout && useStderr {
-		seqMu = new(sync.Mutex)
 	}
 
 	if useStdout {
@@ -106,7 +104,14 @@ func (h *Handler) createTerminalStream(
 				wg.Done()
 			}()
 
-			h.uploadDataOutput(ctx, sid, readStdout, arhatgopb.MSG_DATA_OUTPUT, readTimeout, pSeq, seqMu)
+			h.uploadDataOutput(
+				ctx,
+				sid,
+				readStdout,
+				arhatgopb.MSG_DATA_OUTPUT,
+				readTimeout,
+				pSeq,
+			)
 		}()
 	}
 
@@ -119,7 +124,14 @@ func (h *Handler) createTerminalStream(
 				wg.Done()
 			}()
 
-			h.uploadDataOutput(ctx, sid, readStderr, arhatgopb.MSG_RUNTIME_DATA_STDERR, readTimeout, pSeq, seqMu)
+			h.uploadDataOutput(
+				ctx,
+				sid,
+				readStderr,
+				arhatgopb.MSG_RUNTIME_DATA_STDERR,
+				readTimeout,
+				pSeq,
+			)
 		}()
 	}
 
@@ -141,50 +153,63 @@ func (h *Handler) uploadDataOutput(
 	kind arhatgopb.MsgType,
 	readTimeout time.Duration,
 	pSeq *uint64,
-	seqMu *sync.Mutex,
 ) {
-	r := iohelper.NewTimeoutReader(rd, 4096)
-	go r.StartBackgroundReading()
+	r := iohelper.NewTimeoutReader(rd)
+	go r.FallbackReading()
 
-	stopSig := ctx.Done()
-	timer := time.NewTimer(0)
-	if !timer.Stop() {
-		<-timer.C
-	}
-
-	defer func() {
-		if !timer.Stop() {
-			select {
-			case <-timer.C:
-			default:
-			}
-		}
-	}()
-
-	for r.WaitUntilHasData(stopSig) {
-		timer.Reset(readTimeout)
-		data, isTimeout := r.ReadUntilTimeout(timer.C)
-		if !isTimeout && !timer.Stop() {
-			<-timer.C
+	buf := make([]byte, h.maxPayloadSize)
+	for r.WaitForData(ctx.Done()) {
+		n, err := r.Read(readTimeout, buf)
+		if err != nil && err != iohelper.ErrDeadlineExceeded {
+			return
 		}
 
-		if seqMu != nil {
-			seqMu.Lock()
-		}
+		data := make([]byte, n)
+		_ = copy(data, buf[:n])
 
-		err := h.SendMsg(&arhatgopb.Msg{
+		err = h.SendMsg(&arhatgopb.Msg{
 			Kind:    kind,
 			Id:      sid,
 			Ack:     nextSeq(pSeq),
 			Payload: data,
 		})
 
-		if seqMu != nil {
-			seqMu.Unlock()
-		}
-
 		if err != nil {
 			return
+		}
+	}
+}
+
+func collectStreamErrors(
+	ctx context.Context,
+	errCh <-chan *aranyagopb.ErrorMsg,
+) *aranyagopb.ErrorMsg {
+	var errMsg *aranyagopb.ErrorMsg
+	for {
+		// drain errCh
+		select {
+		case <-ctx.Done():
+			return &aranyagopb.ErrorMsg{
+				Kind:        aranyagopb.ERR_COMMON,
+				Description: ctx.Err().Error(),
+				Code:        exechelper.DefaultExitCodeOnError,
+			}
+		case e, more := <-errCh:
+			if e != nil {
+				if errMsg == nil {
+					errMsg = e
+				} else {
+					if e.Code != 0 && errMsg.Code == 0 {
+						errMsg.Code = e.Code
+					}
+
+					errMsg.Description = errMsg.Description + "; " + e.Description
+				}
+			}
+
+			if !more {
+				return errMsg
+			}
 		}
 	}
 }

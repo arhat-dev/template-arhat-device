@@ -2,6 +2,17 @@ module ext.arhat.dev/template-go
 
 go 1.15
 
+require (
+	arhat.dev/aranya-proto v0.2.3
+	arhat.dev/arhat-proto v0.4.2
+	arhat.dev/libext v0.4.3
+	arhat.dev/pkg v0.3.5
+	ext.arhat.dev/runtimeutil v0.1.4
+	github.com/spf13/cobra v1.1.1
+	github.com/spf13/pflag v1.0.5
+	gopkg.in/yaml.v2 v2.3.0
+)
+
 replace (
 	k8s.io/api => github.com/kubernetes/api v0.18.10
 	k8s.io/apiextensions-apiserver => github.com/kubernetes/apiextensions-apiserver v0.18.10
@@ -29,14 +40,4 @@ replace (
 	k8s.io/sample-apiserver => github.com/kubernetes/sample-apiserver v0.18.10
 	k8s.io/utils => github.com/kubernetes/utils v0.0.0-20200821003339-5e75c0163111
 	vbom.ml/util => github.com/fvbommel/util v0.0.2
-)
-
-require (
-	arhat.dev/aranya-proto v0.2.3
-	arhat.dev/arhat-proto v0.4.2
-	arhat.dev/libext v0.4.1
-	arhat.dev/pkg v0.3.0
-	github.com/spf13/cobra v1.1.1
-	github.com/spf13/pflag v1.0.5
-	gopkg.in/yaml.v2 v2.3.0
 )

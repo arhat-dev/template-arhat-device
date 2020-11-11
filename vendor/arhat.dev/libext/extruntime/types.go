@@ -59,8 +59,11 @@ type RuntimeEngine interface {
 		stdout, stderr io.Writer,
 		command []string,
 		tty bool,
-		errCh chan<- *aranyagopb.ErrorMsg,
-	) (doResize types.ResizeHandleFunc, err error)
+	) (
+		doResize types.ResizeHandleFunc,
+		errCh <-chan *aranyagopb.ErrorMsg,
+		err error,
+	)
 
 	// Attach a running container's stdin/stdout/stderr
 	Attach(
@@ -68,8 +71,11 @@ type RuntimeEngine interface {
 		podUID, container string,
 		stdin io.Reader,
 		stdout, stderr io.Writer,
-		errCh chan<- *aranyagopb.ErrorMsg,
-	) (doResize types.ResizeHandleFunc, err error)
+	) (
+		doResize types.ResizeHandleFunc,
+		errCh <-chan *aranyagopb.ErrorMsg,
+		err error,
+	)
 
 	// Logs retrieve
 	Logs(
@@ -85,8 +91,12 @@ type RuntimeEngine interface {
 		protocol string,
 		port int32,
 		upstream io.Reader,
-		downstream io.Writer,
-	) error
+	) (
+		downstream io.ReadCloser,
+		closeWrite func(),
+		readErrCh <-chan error,
+		err error,
+	)
 
 	/*
 

@@ -6,7 +6,7 @@ arhat.dev/aranya-proto/aranyagopb/runtimepb
 # arhat.dev/arhat-proto v0.4.2
 ## explicit
 arhat.dev/arhat-proto/arhatgopb
-# arhat.dev/libext v0.4.1
+# arhat.dev/libext v0.4.3
 ## explicit
 arhat.dev/libext
 arhat.dev/libext/codec
@@ -16,9 +16,10 @@ arhat.dev/libext/extperipheral
 arhat.dev/libext/extruntime
 arhat.dev/libext/types
 arhat.dev/libext/util
-# arhat.dev/pkg v0.3.0
+# arhat.dev/pkg v0.3.5
 ## explicit
 arhat.dev/pkg/envhelper
+arhat.dev/pkg/exechelper
 arhat.dev/pkg/hashhelper
 arhat.dev/pkg/iohelper
 arhat.dev/pkg/log
@@ -26,9 +27,16 @@ arhat.dev/pkg/pipenet
 arhat.dev/pkg/queue
 arhat.dev/pkg/tlshelper
 arhat.dev/pkg/wellknownerrors
+# ext.arhat.dev/runtimeutil v0.1.4
+## explicit
+ext.arhat.dev/runtimeutil/storageutil
+ext.arhat.dev/runtimeutil/storageutil/general
+ext.arhat.dev/runtimeutil/storageutil/sshfs
 # github.com/Microsoft/go-winio v0.4.15
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/pkg/guid
+# github.com/creack/pty v1.1.11
+github.com/creack/pty
 # github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/sortkeys
@@ -80,6 +88,8 @@ golang.org/x/xerrors/internal
 # gopkg.in/yaml.v2 v2.3.0
 ## explicit
 gopkg.in/yaml.v2
+# gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
+gopkg.in/yaml.v3
 # k8s.io/api => github.com/kubernetes/api v0.18.10
 # k8s.io/apiextensions-apiserver => github.com/kubernetes/apiextensions-apiserver v0.18.10
 # k8s.io/apimachinery => github.com/kubernetes/apimachinery v0.18.10

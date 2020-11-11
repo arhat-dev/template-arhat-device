@@ -21,12 +21,16 @@ import (
 	"arhat.dev/pkg/tlshelper"
 	"github.com/spf13/pflag"
 
+	"ext.arhat.dev/runtimeutil/storageutil"
 	"ext.arhat.dev/template-go/pkg/constant"
 )
 
 // nolint:lll
 type Config struct {
-	TemplateGo AppConfig `json:"templateGo" yaml:"templateGo"`
+	App AppConfig `json:"app" yaml:"app"`
+
+	Runtime RuntimeConfig            `json:"runtime" yaml:"runtime"`
+	Storage storageutil.ClientConfig `json:"storage" yaml:"storage"`
 }
 
 type AppConfig struct {
@@ -35,15 +39,19 @@ type AppConfig struct {
 	// Endpoint url for the extension server of arhat
 	Endpoint string `json:"endpoint" yaml:"endpoint"`
 
+	// affects udp packaet payload size
+	MaxDataMessagePayload int `json:"maxDataMessagePayload" yaml:"maxDataMessagePayload"`
+
 	// TLS Client config for the endpoint
 	TLS tlshelper.TLSConfig `json:"tls" yaml:"tls"`
 }
 
-func FlagsForTemplateGo(prefix string, config *AppConfig) *pflag.FlagSet {
+func FlagsForApp(prefix string, config *AppConfig) *pflag.FlagSet {
 	fs := pflag.NewFlagSet("app", pflag.ExitOnError)
 
 	fs.StringVar(&config.Endpoint, prefix+"endpoint",
 		constant.DefaultArhatExtensionEndpoint, "set arhat listen address")
-
+	fs.IntVar(&config.MaxDataMessagePayload, prefix+"maxDataMessagePayload", 65535, "")
+	fs.AddFlagSet(tlshelper.FlagsForTLSConfig(prefix+"tls.", &config.TLS))
 	return fs
 }
