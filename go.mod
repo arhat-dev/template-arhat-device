@@ -7,7 +7,7 @@ require (
 	arhat.dev/arhat-proto v0.4.2
 	arhat.dev/libext v0.4.3
 	arhat.dev/pkg v0.3.5
-	ext.arhat.dev/runtimeutil v0.1.4
+	ext.arhat.dev/runtimeutil v0.1.5
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
 	gopkg.in/yaml.v2 v2.3.0

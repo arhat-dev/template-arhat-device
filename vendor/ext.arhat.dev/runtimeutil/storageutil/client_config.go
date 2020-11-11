@@ -26,9 +26,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type DriverConfig struct {
+	Driver string      `json:"driver" yaml:"driver"`
+	Config interface{} `json:"config" yaml:"config"`
+}
+
 type ClientConfig struct {
-	Driver       string      `json:"driver" yaml:"driver"`
-	DriverConfig interface{} `json:"driverConfig" yaml:"driverConfig"`
+	DriverConfig `json:",inline" yaml:",inline"`
 
 	StdoutFile string `json:"stdoutFile" yaml:"stdoutFile"`
 	StderrFile string `json:"stderrFile" yaml:"stderrFile"`
@@ -38,7 +42,7 @@ type ClientConfig struct {
 }
 
 func (c *ClientConfig) CreateClient(ctx context.Context) (*Client, error) {
-	d, err := NewDriver(c.Driver, c.DriverConfig)
+	d, err := NewDriver(c.Driver, c.DriverConfig.Config)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +50,7 @@ func (c *ClientConfig) CreateClient(ctx context.Context) (*Client, error) {
 	return NewClient(ctx, d, c.SuccessTimeWait, c.ExtraLookupPaths, c.StdoutFile, c.StderrFile)
 }
 
-func (c *ClientConfig) UnmarshalJSON(data []byte) error {
+func (c *DriverConfig) UnmarshalJSON(data []byte) error {
 	m := make(map[string]interface{})
 
 	err := json.Unmarshal(data, &m)
@@ -57,7 +61,7 @@ func (c *ClientConfig) UnmarshalJSON(data []byte) error {
 	return unmarshalClientConfig(m, c)
 }
 
-func (c *ClientConfig) UnmarshalYAML(value *yaml.Node) error {
+func (c *DriverConfig) UnmarshalYAML(value *yaml.Node) error {
 	m := make(map[string]interface{})
 
 	configData, err := yaml.Marshal(value)
@@ -73,10 +77,11 @@ func (c *ClientConfig) UnmarshalYAML(value *yaml.Node) error {
 	return unmarshalClientConfig(m, c)
 }
 
-func unmarshalClientConfig(m map[string]interface{}, c *ClientConfig) error {
+func unmarshalClientConfig(m map[string]interface{}, c *DriverConfig) error {
 	d, ok := m["driver"]
 	if !ok {
-		return fmt.Errorf("must specify driver type")
+		// no driver provided
+		return nil
 	}
 
 	driverName, ok := d.(string)
@@ -85,19 +90,19 @@ func unmarshalClientConfig(m map[string]interface{}, c *ClientConfig) error {
 	}
 
 	var err error
-	c.DriverConfig, err = NewConfig(driverName)
+	c.Config, err = NewConfig(driverName)
 	if err != nil {
 		return fmt.Errorf("unknown driver %q: %w", driverName, err)
 	}
 
-	configData, err := json.Marshal(m)
+	configData, err := json.Marshal(m["config"])
 	if err != nil {
 		return fmt.Errorf("failed to get driver config bytes: %w", err)
 	}
 
 	dec := json.NewDecoder(bytes.NewReader(configData))
 	dec.DisallowUnknownFields()
-	err = dec.Decode(c)
+	err = dec.Decode(c.Config)
 	if err != nil {
 		return fmt.Errorf("failed to resolve driver config %s: %w", driverName, err)
 	}

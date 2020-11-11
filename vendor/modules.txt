@@ -27,7 +27,7 @@ arhat.dev/pkg/pipenet
 arhat.dev/pkg/queue
 arhat.dev/pkg/tlshelper
 arhat.dev/pkg/wellknownerrors
-# ext.arhat.dev/runtimeutil v0.1.4
+# ext.arhat.dev/runtimeutil v0.1.5
 ## explicit
 ext.arhat.dev/runtimeutil/storageutil
 ext.arhat.dev/runtimeutil/storageutil/general
