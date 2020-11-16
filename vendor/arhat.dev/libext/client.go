@@ -26,16 +26,13 @@ import (
 	"net/url"
 	"runtime"
 	"strings"
-	"time"
 
 	"arhat.dev/arhat-proto/arhatgopb"
-	"arhat.dev/pkg/pipenet"
-	"github.com/pion/dtls/v2"
+	"arhat.dev/pkg/nethelper"
 	"golang.org/x/sync/errgroup"
 
 	"arhat.dev/libext/codec"
-	"arhat.dev/libext/types"
-	"arhat.dev/libext/util"
+	"arhat.dev/libext/protoutil"
 )
 
 type (
@@ -46,10 +43,10 @@ func NewClient(
 	ctx context.Context,
 	kind arhatgopb.ExtensionType,
 	name string,
-	c types.Codec,
+	c codec.Interface,
 
 	// connection management
-	dialer *net.Dialer,
+	dialer interface{},
 	endpointURL string,
 	tlsConfig *tls.Config,
 ) (*Client, error) {
@@ -58,9 +55,12 @@ func NewClient(
 		return nil, fmt.Errorf("invalid endpoint url: %w", err)
 	}
 
-	jsonCodec := codec.GetCodec(arhatgopb.CODEC_JSON)
+	jsonCodec, ok := codec.Get(arhatgopb.CODEC_JSON)
+	if !ok {
+		return nil, fmt.Errorf("json codec required but not found")
+	}
 
-	regMsg, err := util.NewMsg(jsonCodec.Marshal, arhatgopb.MSG_REGISTER, 0, 0, &arhatgopb.RegisterMsg{
+	regMsg, err := protoutil.NewMsg(jsonCodec.Marshal, arhatgopb.MSG_REGISTER, 0, 0, &arhatgopb.RegisterMsg{
 		Name:          name,
 		ExtensionType: kind,
 		Codec:         c.Type(),
@@ -75,57 +75,26 @@ func NewClient(
 		return nil, fmt.Errorf("failed to marshal register message: %w", err)
 	}
 
-	if dialer == nil {
-		dialer = &net.Dialer{
-			Timeout:       0,
-			Deadline:      time.Time{},
-			LocalAddr:     nil,
-			FallbackDelay: 0,
-			KeepAlive:     0,
-			Resolver:      nil,
-			Control:       nil,
-		}
-	}
-
 	var (
-		connector connectFunc
+		network string
+		addr    string
 	)
-	switch s := strings.ToLower(u.Scheme); s {
-	case "tcp", "tcp4", "tcp6": // nolint:goconst
-		_, err = net.ResolveTCPAddr(s, u.Host)
-		connector = func() (net.Conn, error) {
-			return dialer.DialContext(ctx, s, u.Host)
-		}
-	case "udp", "udp4", "udp6": // nolint:goconst
-		_, err = net.ResolveUDPAddr(s, u.Host)
-		connector = func() (net.Conn, error) {
-			return dialer.DialContext(ctx, s, u.Host)
-		}
-	case "unix": // nolint:goconst
-		_, err = net.ResolveUnixAddr(s, u.Path)
-		connector = func() (net.Conn, error) {
-			return dialer.DialContext(ctx, s, u.Path)
-		}
+	switch network = strings.ToLower(u.Scheme); network {
 	case "pipe":
-		connector = func() (net.Conn, error) {
-			if runtime.GOOS == "windows" {
-				host := u.Host
-				path := u.Path
-				if path == "" {
-					host = "."
-					path = u.Host
-				}
-
-				return pipenet.DialContext(ctx, fmt.Sprintf(`\\%s\pipe\%s`, host, path))
+		if runtime.GOOS == "windows" {
+			host := u.Host
+			path := u.Path
+			if path == "" {
+				host = "."
+				path = u.Host
 			}
 
-			return pipenet.DialContext(ctx, u.Path)
+			addr = fmt.Sprintf(`\\%s\pipe\%s`, host, path)
+		} else {
+			addr = u.Path
 		}
 	default:
-		return nil, fmt.Errorf("unsupported endpoint protocol %q", u.Scheme)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("failed to resolve %s address: %w", u.Scheme, err)
+		addr = u.Host + u.Path
 	}
 
 	return &Client{
@@ -134,35 +103,11 @@ func NewClient(
 		codec:  c,
 		regMsg: regMsgBuf.Bytes(),
 
-		createConnection: func() (_ net.Conn, err error) {
-			var innerConn net.Conn
-
-			innerConn, err = connector()
-			if err != nil {
-				return nil, err
-			}
+		createConnection: func() (net.Conn, error) {
 			if tlsConfig == nil {
-				return innerConn, nil
+				return nethelper.Dial(ctx, dialer, network, addr, nil)
 			}
-
-			defer func() {
-				if err != nil {
-					_ = innerConn.Close()
-				}
-			}()
-
-			// tls enabled
-			_, isUDPConn := innerConn.(*net.UDPConn)
-			if isUDPConn {
-				// currently only udp supports dtls
-				dtlsConfig := util.ConvertTLSConfigToDTLSConfig(tlsConfig)
-				dtlsConfig.ConnectContextMaker = func() (context.Context, func()) {
-					return context.WithCancel(ctx)
-				}
-				return dtls.ClientWithContext(ctx, innerConn, dtlsConfig)
-			}
-
-			return tls.Client(innerConn, tlsConfig), nil
+			return nethelper.Dial(ctx, dialer, network, addr, tlsConfig)
 		},
 	}, nil
 }
@@ -170,7 +115,7 @@ func NewClient(
 type Client struct {
 	ctx context.Context
 
-	codec  types.Codec
+	codec  codec.Interface
 	regMsg []byte
 
 	createConnection connectFunc

@@ -1,5 +1,3 @@
-// +build !windows,!plan9,!solaris
-
 /*
 Copyright 2020 The arhat.dev Authors.
 
@@ -16,20 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package iohelper
+package protoutil
 
 import (
-	"syscall"
-	"unsafe"
+	"arhat.dev/arhat-proto/arhatgopb"
+
+	"arhat.dev/libext/codec"
 )
 
-// CheckBytesToRead calls ioctl(fd, FIONREAD) to check ready data size of fd
-func CheckBytesToRead(fd uintptr) (int, error) {
-	var value int
-	_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, fd, _FIONREAD, uintptr(unsafe.Pointer(&value)))
-	if errno != 0 {
-		return 0, errno
+func NewMsg(
+	marshal codec.MarshalFunc,
+	kind arhatgopb.MsgType,
+	id, ack uint64, body interface{},
+) (*arhatgopb.Msg, error) {
+	payload, err := marshal(body)
+	if err != nil {
+		return nil, err
 	}
 
-	return value, nil
+	return &arhatgopb.Msg{
+		Kind:    kind,
+		Id:      id,
+		Ack:     ack,
+		Payload: payload,
+	}, nil
 }

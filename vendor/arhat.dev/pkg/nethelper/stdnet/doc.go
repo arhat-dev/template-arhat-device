@@ -14,15 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package codecpb implements protobuf codec for libext
-package codecpb
-
-import (
-	"arhat.dev/arhat-proto/arhatgopb"
-
-	"arhat.dev/libext/codec"
-)
-
-func init() {
-	codec.RegisterCodec(arhatgopb.CODEC_PROTOBUF, new(Codec))
-}
+// Package stdnet register tcp/tcp4/tcp6/udp/udp4/udp6/unix network implementation
+// from standard `net` library
+package stdnet

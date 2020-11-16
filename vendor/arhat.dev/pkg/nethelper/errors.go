@@ -1,3 +1,5 @@
+// +build !nonethelper
+
 /*
 Copyright 2020 The arhat.dev Authors.
 
@@ -14,28 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package util
+package nethelper
 
-import (
-	"arhat.dev/arhat-proto/arhatgopb"
+import "errors"
 
-	"arhat.dev/libext/types"
+var (
+	ErrDialerInvalid       = errors.New("invalid dialer")
+	ErrTLSConfigInvalid    = errors.New("invalid tls config")
+	ErrListenConfigInvalid = errors.New("invalid listen config")
 )
-
-func NewCmd(
-	marshal types.MarshalFunc,
-	kind arhatgopb.CmdType,
-	id, seq uint64, body interface{},
-) (*arhatgopb.Cmd, error) {
-	payload, err := marshal(body)
-	if err != nil {
-		return nil, err
-	}
-
-	return &arhatgopb.Cmd{
-		Kind:    kind,
-		Id:      id,
-		Seq:     seq,
-		Payload: payload,
-	}, nil
-}

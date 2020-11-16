@@ -17,9 +17,3 @@ limitations under the License.
 // Package libext provides client and controller for creating extension
 // controllers with arhat-proto
 package libext
-
-import (
-	// import default codec
-	_ "arhat.dev/libext/codec/codecjson"
-	_ "arhat.dev/libext/codec/codecpb"
-)

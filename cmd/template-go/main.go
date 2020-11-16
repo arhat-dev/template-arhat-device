@@ -24,6 +24,19 @@ import (
 
 	"ext.arhat.dev/template-go/pkg/cmd"
 	"ext.arhat.dev/template-go/pkg/version"
+
+	// Add network support
+	_ "arhat.dev/pkg/nethelper/piondtls" // add udp-dtls support
+	_ "arhat.dev/pkg/nethelper/pipenet"  // add pipe support
+	_ "arhat.dev/pkg/nethelper/stdnet"   // add tcp/udp/unix support
+
+	// Add codec support
+	_ "arhat.dev/libext/codec/gogoprotobuf" // add protobuf codec support
+	_ "arhat.dev/libext/codec/stdjson"      // add json codec support
+
+	// Add storage support
+	_ "ext.arhat.dev/runtimeutil/storageutil/general" // add general storage support
+	_ "ext.arhat.dev/runtimeutil/storageutil/sshfs"   // add sshfs storage support
 )
 
 func main() {

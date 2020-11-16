@@ -1,3 +1,5 @@
+// +build !nocodec_stdjson
+
 /*
 Copyright 2020 The arhat.dev Authors.
 
@@ -14,15 +16,39 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package codecjson uses stdlib json for libext
-package codecjson
+package stdjson
 
 import (
+	"encoding/json"
+	"io"
+
 	"arhat.dev/arhat-proto/arhatgopb"
 
 	"arhat.dev/libext/codec"
 )
 
 func init() {
-	codec.RegisterCodec(arhatgopb.CODEC_JSON, new(Codec))
+	codec.Register(arhatgopb.CODEC_JSON, new(Codec))
+}
+
+type Codec struct{}
+
+func (c *Codec) Type() arhatgopb.CodecType {
+	return arhatgopb.CODEC_JSON
+}
+
+func (c *Codec) NewEncoder(w io.Writer) codec.Encoder {
+	return json.NewEncoder(w)
+}
+
+func (c *Codec) NewDecoder(r io.Reader) codec.Decoder {
+	return json.NewDecoder(r)
+}
+
+func (c *Codec) Marshal(v interface{}) ([]byte, error) {
+	return json.Marshal(v)
+}
+
+func (c *Codec) Unmarshal(data []byte, out interface{}) error {
+	return json.Unmarshal(data, out)
 }

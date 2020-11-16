@@ -19,15 +19,14 @@ package extruntime
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	"arhat.dev/aranya-proto/aranyagopb"
 	"arhat.dev/aranya-proto/aranyagopb/runtimepb"
 	"arhat.dev/arhat-proto/arhatgopb"
 	"arhat.dev/pkg/log"
 
+	"arhat.dev/libext/extutil"
 	"arhat.dev/libext/types"
-	"arhat.dev/libext/util"
 )
 
 type cmdHandleFunc func(ctx context.Context, sid uint64, payload []byte) (*runtimepb.Packet, error)
@@ -37,10 +36,8 @@ func NewHandler(
 	maxSingleMessagePayloadSize int,
 	impl RuntimeEngine,
 ) types.Handler {
-	mu := new(sync.RWMutex)
-
 	h := &Handler{
-		BaseHandler: util.NewBaseHandler(mu),
+		BaseHandler: extutil.NewBaseHandler(),
 
 		maxPayloadSize: maxSingleMessagePayloadSize,
 
@@ -48,9 +45,7 @@ func NewHandler(
 		impl:   impl,
 
 		funcMap: nil,
-		streams: util.NewStreamManager(),
-
-		mu: mu,
+		streams: extutil.NewStreamManager(),
 	}
 
 	h.funcMap = map[runtimepb.PacketType]cmdHandleFunc{
@@ -75,7 +70,7 @@ func NewHandler(
 }
 
 type Handler struct {
-	*util.BaseHandler
+	*extutil.BaseHandler
 
 	maxPayloadSize int
 
@@ -83,9 +78,7 @@ type Handler struct {
 	impl   RuntimeEngine
 
 	funcMap map[runtimepb.PacketType]cmdHandleFunc
-	streams *util.StreamManager
-
-	mu *sync.RWMutex
+	streams *extutil.StreamManager
 }
 
 var _zero = make([]byte, 0)
@@ -95,20 +88,20 @@ func (h *Handler) HandleCmd(
 	sid, seq uint64,
 	kind arhatgopb.CmdType,
 	payload []byte,
-) (interface{}, error) {
+) (arhatgopb.MsgType, interface{}, error) {
 	switch kind {
 	case arhatgopb.CMD_DATA_INPUT:
 		if payload == nil {
 			payload = _zero
 		}
 		h.streams.Write(sid, seq, payload)
-		return nil, nil
+		return 0, nil, nil
 	case arhatgopb.CMD_DATA_CLOSE:
 		h.streams.Write(sid, seq, nil)
-		return nil, nil
+		return 0, nil, nil
 	case arhatgopb.CMD_RUNTIME_ARANYA_PROTO:
 	default:
-		return nil, fmt.Errorf("unknown cmd type %d", kind)
+		return 0, nil, fmt.Errorf("unknown cmd type %d", kind)
 	}
 
 	// is normal runtime cmd, decode as aranya-proto runtime packet
@@ -116,12 +109,12 @@ func (h *Handler) HandleCmd(
 	pkt := new(runtimepb.Packet)
 	err := pkt.Unmarshal(payload)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
 	do, ok := h.funcMap[pkt.Kind]
 	if !ok {
-		return nil, fmt.Errorf("unknown runtime cmd type %d", kind)
+		return 0, nil, fmt.Errorf("unknown runtime cmd type %d", kind)
 	}
 
 	go func() {
@@ -169,7 +162,7 @@ func (h *Handler) HandleCmd(
 		}
 	}()
 
-	return nil, nil
+	return 0, nil, nil
 }
 
 func (h *Handler) handleGetInfo(_ context.Context, _ uint64, _ []byte) (*runtimepb.Packet, error) {

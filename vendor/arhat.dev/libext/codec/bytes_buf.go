@@ -14,35 +14,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package codecjson
+package codec
 
-import (
-	"encoding/json"
-	"io"
+import "sync"
 
-	"arhat.dev/arhat-proto/arhatgopb"
-
-	"arhat.dev/libext/types"
-)
-
-type Codec struct{}
-
-func (c *Codec) Type() arhatgopb.CodecType {
-	return arhatgopb.CODEC_JSON
+var bytesBufPool = &sync.Pool{
+	New: func() interface{} {
+		buf := make([]byte, 32)
+		return &buf
+	},
 }
 
-func (c *Codec) NewEncoder(w io.Writer) types.Encoder {
-	return json.NewEncoder(w)
+func GetBytesBuf(size int) []byte {
+	buf := *bytesBufPool.Get().(*[]byte)
+	if len(buf) >= size {
+		return buf
+	}
+
+	// resize to expected size
+	extend := size - len(buf)
+	if extend < size {
+		return append(buf, make([]byte, extend)...)
+	}
+	return append(make([]byte, extend), buf...)
 }
 
-func (c *Codec) NewDecoder(r io.Reader) types.Decoder {
-	return json.NewDecoder(r)
-}
-
-func (c *Codec) Marshal(v interface{}) ([]byte, error) {
-	return json.Marshal(v)
-}
-
-func (c *Codec) Unmarshal(data []byte, out interface{}) error {
-	return json.Unmarshal(data, out)
+func PutBytesBuf(b *[]byte) {
+	bytesBufPool.Put(b)
 }

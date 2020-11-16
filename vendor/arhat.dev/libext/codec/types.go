@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package types
+package codec
 
 import (
 	"io"
@@ -39,9 +39,9 @@ type (
 	UnmarshalFunc func(data []byte, out interface{}) error
 )
 
-// Codec knows how to encode/decode all kinds of data,
+// Interface of codec knows how to encode/decode all kinds of data,
 // including stream data
-type Codec interface {
+type Interface interface {
 	// Type is the codec kind
 	Type() arhatgopb.CodecType
 

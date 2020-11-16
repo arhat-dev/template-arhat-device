@@ -32,10 +32,6 @@ import (
 	"ext.arhat.dev/template-go/pkg/constant"
 	"ext.arhat.dev/template-go/pkg/peripheral"
 	"ext.arhat.dev/template-go/pkg/runtime"
-
-	_ "arhat.dev/libext/codec/codecpb"                // add protobuf codec support
-	_ "ext.arhat.dev/runtimeutil/storageutil/general" // add general storage support
-	_ "ext.arhat.dev/runtimeutil/storageutil/sshfs"   // add sshfs storage support
 )
 
 func NewTemplateGoCmd() *cobra.Command {
@@ -90,7 +86,11 @@ func run(appCtx context.Context, config *conf.Config) error {
 	go func() {
 		// sample peripheral controller
 
-		c := codec.GetCodec(arhatgopb.CODEC_PROTOBUF)
+		c, ok := codec.Get(arhatgopb.CODEC_JSON)
+		if !ok {
+			panic("failed to get json codec")
+		}
+
 		client, err := libext.NewClient(
 			appCtx,
 			arhatgopb.EXTENSION_PERIPHERAL,
@@ -137,7 +137,10 @@ func run(appCtx context.Context, config *conf.Config) error {
 	go func() {
 		// sample runtime engine
 
-		c := codec.GetCodec(arhatgopb.CODEC_PROTOBUF)
+		c, ok := codec.Get(arhatgopb.CODEC_PROTOBUF)
+		if !ok {
+			panic("failed to get protobuf codec")
+		}
 		client, err := libext.NewClient(
 			appCtx,
 			arhatgopb.EXTENSION_RUNTIME,

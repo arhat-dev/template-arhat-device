@@ -16,9 +16,3 @@ limitations under the License.
 
 // Package extperipheral provides helper functions for creating peripheral extensions
 package extperipheral
-
-import (
-	// import default codec
-	_ "arhat.dev/libext/codec/codecjson"
-	_ "arhat.dev/libext/codec/codecpb"
-)

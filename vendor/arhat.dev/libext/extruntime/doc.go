@@ -16,9 +16,3 @@ limitations under the License.
 
 // Package extruntime provides easy to ues wrap for runtime extension development
 package extruntime
-
-import (
-	// import default codec
-	_ "arhat.dev/libext/codec/codecjson"
-	_ "arhat.dev/libext/codec/codecpb"
-)

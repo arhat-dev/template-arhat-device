@@ -25,16 +25,16 @@ import (
 	"arhat.dev/pkg/log"
 	"arhat.dev/pkg/wellknownerrors"
 
+	"arhat.dev/libext/codec"
+	"arhat.dev/libext/extutil"
 	"arhat.dev/libext/types"
-	"arhat.dev/libext/util"
 )
 
-type cmdHandleFunc func(ctx context.Context, p Peripheral, payload []byte) (interface{}, error)
+type cmdHandleFunc func(ctx context.Context, p Peripheral, payload []byte) (arhatgopb.MsgType, interface{}, error)
 
-func NewHandler(logger log.Interface, unmarshal types.UnmarshalFunc, impl PeripheralConnector) types.Handler {
-	mu := new(sync.RWMutex)
+func NewHandler(logger log.Interface, unmarshal codec.UnmarshalFunc, impl PeripheralConnector) types.Handler {
 	h := &Handler{
-		BaseHandler: util.NewBaseHandler(mu),
+		BaseHandler: extutil.NewBaseHandler(),
 
 		logger: logger,
 
@@ -54,11 +54,11 @@ func NewHandler(logger log.Interface, unmarshal types.UnmarshalFunc, impl Periph
 }
 
 type Handler struct {
-	*util.BaseHandler
+	*extutil.BaseHandler
 
 	logger log.Interface
 
-	unmarshal   types.UnmarshalFunc
+	unmarshal   codec.UnmarshalFunc
 	impl        PeripheralConnector
 	peripherals *sync.Map
 
@@ -70,19 +70,19 @@ func (c *Handler) HandleCmd(
 	id, seq uint64,
 	kind arhatgopb.CmdType,
 	payload []byte,
-) (interface{}, error) {
+) (arhatgopb.MsgType, interface{}, error) {
 	switch kind {
 	case arhatgopb.CMD_PERIPHERAL_CLOSE:
 		c.logger.D("removing peripheral")
 		c.removePeripheral(ctx, id)
-		return &arhatgopb.DoneMsg{}, nil
+		return arhatgopb.MSG_DONE, &arhatgopb.DoneMsg{}, nil
 	case arhatgopb.CMD_PERIPHERAL_CONNECT:
 		c.logger.D("connecting peripheral")
 		err := c.handlePeripheralConnect(ctx, id, payload)
 		if err != nil {
-			return nil, err
+			return 0, nil, err
 		}
-		return &arhatgopb.DoneMsg{}, nil
+		return arhatgopb.MSG_DONE, &arhatgopb.DoneMsg{}, nil
 	default:
 	}
 
@@ -91,20 +91,15 @@ func (c *Handler) HandleCmd(
 	handle, ok := c.funcMap[kind]
 	if !ok {
 		c.logger.I("unknown peripheral cmd type", log.Int32("kind", int32(kind)))
-		return nil, fmt.Errorf("unknown cmd")
+		return 0, nil, fmt.Errorf("unknown cmd")
 	}
 
 	p, ok := c.getPeripheral(id)
 	if !ok {
-		return nil, wellknownerrors.ErrNotFound
+		return 0, nil, wellknownerrors.ErrNotFound
 	}
 
-	ret, err := handle(ctx, p, payload)
-	if err != nil {
-		return nil, err
-	}
-
-	return ret, nil
+	return handle(ctx, p, payload)
 }
 
 func (c *Handler) handlePeripheralConnect(ctx context.Context, peripheralID uint64, payload []byte) (err error) {
@@ -162,34 +157,34 @@ func (c *Handler) removePeripheral(ctx context.Context, peripheralID uint64) {
 
 func (c *Handler) handlePeripheralOperate(
 	ctx context.Context, p Peripheral, payload []byte,
-) (interface{}, error) {
+) (arhatgopb.MsgType, interface{}, error) {
 	spec := new(arhatgopb.PeripheralOperateCmd)
 	err := c.unmarshal(payload, spec)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal PeripheralOperateCmd: %w", err)
+		return 0, nil, fmt.Errorf("failed to unmarshal PeripheralOperateCmd: %w", err)
 	}
 
 	ret, err := p.Operate(ctx, spec.Params, spec.Data)
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute operation: %w", err)
+		return 0, nil, fmt.Errorf("failed to execute operation: %w", err)
 	}
 
-	return &arhatgopb.PeripheralOperationResultMsg{Result: ret}, nil
+	return arhatgopb.MSG_PERIPHERAL_OPERATION_RESULT, &arhatgopb.PeripheralOperationResultMsg{Result: ret}, nil
 }
 
 func (c *Handler) handlePeripheralMetricsCollect(
 	ctx context.Context, p Peripheral, payload []byte,
-) (interface{}, error) {
+) (arhatgopb.MsgType, interface{}, error) {
 	spec := new(arhatgopb.PeripheralMetricsCollectCmd)
 	err := c.unmarshal(payload, spec)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal PeripheralMetricsCollectCmd: %w", err)
+		return 0, nil, fmt.Errorf("failed to unmarshal PeripheralMetricsCollectCmd: %w", err)
 	}
 
 	ret, err := p.CollectMetrics(ctx, spec.Params)
 	if err != nil {
-		return nil, fmt.Errorf("failed to collect peripheral metrics: %w", err)
+		return 0, nil, fmt.Errorf("failed to collect peripheral metrics: %w", err)
 	}
 
-	return &arhatgopb.PeripheralMetricsMsg{Values: ret}, nil
+	return arhatgopb.MSG_PERIPHERAL_METRICS, &arhatgopb.PeripheralMetricsMsg{Values: ret}, nil
 }

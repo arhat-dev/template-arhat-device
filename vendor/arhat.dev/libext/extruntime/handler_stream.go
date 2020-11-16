@@ -155,17 +155,19 @@ func (h *Handler) uploadDataOutput(
 	pSeq *uint64,
 ) {
 	r := iohelper.NewTimeoutReader(rd)
-	go r.FallbackReading()
+	go r.FallbackReading(ctx.Done())
 
 	buf := make([]byte, h.maxPayloadSize)
 	for r.WaitForData(ctx.Done()) {
-		n, err := r.Read(readTimeout, buf)
+		data, shouldCopy, err := r.Read(readTimeout, buf)
 		if err != nil && err != iohelper.ErrDeadlineExceeded {
 			return
 		}
 
-		data := make([]byte, n)
-		_ = copy(data, buf[:n])
+		if shouldCopy {
+			data = make([]byte, len(data))
+			_ = copy(data, buf[:len(data)])
+		}
 
 		err = h.SendMsg(&arhatgopb.Msg{
 			Kind:    kind,

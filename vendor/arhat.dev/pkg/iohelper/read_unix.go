@@ -1,3 +1,5 @@
+// +build !windows,!plan9,!solaris,!aix,!js
+
 /*
 Copyright 2020 The arhat.dev Authors.
 
@@ -14,31 +16,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package util
+package iohelper
 
-import "sync"
+import (
+	"syscall"
+	"unsafe"
+)
 
-var bytesBufPool = &sync.Pool{
-	New: func() interface{} {
-		buf := make([]byte, 32)
-		return &buf
-	},
-}
-
-func GetBytesBuf(size int) []byte {
-	buf := *bytesBufPool.Get().(*[]byte)
-	if len(buf) >= size {
-		return buf
+// CheckBytesToRead calls ioctl(fd, FIONREAD) to check ready data size of fd
+func CheckBytesToRead(fd uintptr) (int, error) {
+	var value int
+	_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, fd, _FIONREAD, uintptr(unsafe.Pointer(&value)))
+	if errno != 0 {
+		return 0, errno
 	}
 
-	// resize to expected size
-	extend := size - len(buf)
-	if extend < size {
-		return append(buf, make([]byte, extend)...)
-	}
-	return append(make([]byte, extend), buf...)
-}
-
-func PutBytesBuf(b *[]byte) {
-	bytesBufPool.Put(b)
+	return value, nil
 }

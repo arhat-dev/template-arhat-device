@@ -1,5 +1,3 @@
-// +build windows plan9 solaris
-
 /*
 Copyright 2020 The arhat.dev Authors.
 
@@ -16,12 +14,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package iohelper
-
-import (
-	"syscall"
-)
-
-func CheckBytesToRead(fd uintptr) (int, error) {
-	return 0, syscall.EINVAL
-}
+// Package codecpb implements protobuf codec for libext
+package gogoprotobuf

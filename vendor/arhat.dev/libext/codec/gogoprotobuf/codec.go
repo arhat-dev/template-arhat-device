@@ -1,3 +1,5 @@
+// +build !nocodec_gogoprotobuf
+
 /*
 Copyright 2020 The arhat.dev Authors.
 
@@ -14,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package codecpb
+package gogoprotobuf
 
 import (
 	"bufio"
@@ -27,9 +29,12 @@ import (
 	"arhat.dev/arhat-proto/arhatgopb"
 	"github.com/gogo/protobuf/proto"
 
-	"arhat.dev/libext/types"
-	"arhat.dev/libext/util"
+	"arhat.dev/libext/codec"
 )
+
+func init() {
+	codec.Register(arhatgopb.CODEC_PROTOBUF, new(Codec))
+}
 
 var (
 	ErrNotProtobufMessage = errors.New("invalid not protobuf message")
@@ -53,11 +58,11 @@ func (c *Codec) Type() arhatgopb.CodecType {
 	return arhatgopb.CODEC_PROTOBUF
 }
 
-func (c *Codec) NewEncoder(w io.Writer) types.Encoder {
+func (c *Codec) NewEncoder(w io.Writer) codec.Encoder {
 	return &Encoder{w}
 }
 
-func (c *Codec) NewDecoder(r io.Reader) types.Decoder {
+func (c *Codec) NewDecoder(r io.Reader) codec.Decoder {
 	return &Decoder{bufio.NewReader(r)}
 }
 
@@ -104,14 +109,14 @@ func (enc *Encoder) Encode(any interface{}) error {
 		return fmt.Errorf("failed to marshal message: %w", err)
 	}
 
-	sizeBuf := util.GetBytesBuf(10)
+	sizeBuf := codec.GetBytesBuf(10)
 	i := binary.PutUvarint(sizeBuf, uint64(len(data)))
 	_, err = enc.w.Write(sizeBuf[:i])
 	if err != nil {
-		util.PutBytesBuf(&sizeBuf)
+		codec.PutBytesBuf(&sizeBuf)
 		return fmt.Errorf("failed to write message size: %w", err)
 	}
-	util.PutBytesBuf(&sizeBuf)
+	codec.PutBytesBuf(&sizeBuf)
 
 	_, err = enc.w.Write(data)
 	if err != nil {
@@ -139,16 +144,16 @@ func (dec *Decoder) Decode(out interface{}) error {
 		return fmt.Errorf("failed to read size of the message: %w", err)
 	}
 
-	data := util.GetBytesBuf(int(size))
+	data := codec.GetBytesBuf(int(size))
 	_, err = io.ReadFull(dec.r, data[:size])
 	if err != nil {
-		util.PutBytesBuf(&data)
+		codec.PutBytesBuf(&data)
 		return fmt.Errorf("failed to read message body: %w", err)
 	}
 	buf := getPbBuf(data[:size])
 	err = buf.Unmarshal(m)
 
-	util.PutBytesBuf(&data)
+	codec.PutBytesBuf(&data)
 	pbBufPool.Put(buf)
 	return err
 }
